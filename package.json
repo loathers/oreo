@@ -1,0 +1,37 @@
+{
+  "name": "oreo",
+  "version": "0.0.0",
+  "author": "Sam Gaus <sam@gaus.co.uk>",
+  "homepage": "",
+  "license": "MIT",
+  "scripts": {
+    "build": "node build.mjs",
+    "format": "prettier --write src/**/*.ts *.{mjs,js,json}",
+    "watch": "node build.mjs --watch",
+    "install-mafia": "create-kolmafia-script --install"
+  },
+  "dependencies": {
+    "kolmafia": "latest",
+    "libram": "^0.10.1"
+  },
+  "type": "module",
+  "devDependencies": {
+    "@babel/core": "^7.26.0",
+    "@babel/preset-env": "^7.26.0",
+    "@babel/preset-typescript": "^7.26.0",
+    "@eslint/js": "^9.17.0",
+    "@trivago/prettier-plugin-sort-imports": "^5.2.1",
+    "@types/babel__core": "^7.20.5",
+    "@types/babel__preset-env": "^7.9.7",
+    "@types/node": "^22.10.5",
+    "create-kolmafia-script": "latest",
+    "esbuild": "^0.24.2",
+    "esbuild-plugin-babel": "^0.2.3",
+    "eslint": "^9.17.0",
+    "eslint-plugin-libram": "^0.4.21",
+    "prettier": "^3.4.2",
+    "typescript": "^5.7.3",
+    "typescript-eslint": "^8.19.1"
+  },
+  "packageManager": "yarn@4.4.1"
+}
