@@ -1,5 +1,5 @@
-import { haveEffect, isWearingOutfit, visitUrl } from "kolmafia";
-import { $effect, $element, $skill, damageTakenByElement, get, have, tuple } from "libram";
+import { haveEffect, isWearingOutfit, myBuffedstat, visitUrl } from "kolmafia";
+import { $effect, $element, $skill, $stat, damageTakenByElement, get, have, tuple } from "libram";
 
 export enum Mine {
   ITZNOTYERZITZ = 1,
@@ -10,13 +10,22 @@ export enum Mine {
   VOLCANO = 6,
 }
 
-export function hasObjectDetection(): boolean {
+export function hasObjectDetection(mine = 1): boolean {
+  if (mine === Mine.CRIMBONIUM && have($effect`Crimbonar`)) return true;
   return haveEffect($effect`Object Detection`) !== 0 || isWearingOutfit("Dwarvish War Uniform");
 }
 
 export function caveInCost(mine: number) {
   switch (mine) {
-    case 6:
+    case Mine.ITZNOTYERZITZ:
+    case Mine.GUMMI:
+    case Mine.CRIMBONIUM:
+      return myBuffedstat($stat`muscle`) * 1.5;
+    case Mine.KNOB:
+      return myBuffedstat($stat`muscle`) * 0.5;
+    case Mine.ANEMONE:
+      return myBuffedstat($stat`muscle`) * 2.5;
+    case Mine.VOLCANO:
       return damageTakenByElement(75, $element`hot`);
     default:
       return 0;
