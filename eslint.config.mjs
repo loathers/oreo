@@ -31,13 +31,6 @@ export default tseslint.config(
       ],
       "no-unused-vars": "off",
       "@typescript-eslint/no-unused-vars": "error",
-      "no-restricted-syntax": [
-        "error",
-        {
-          selector: "TSEnumDeclaration:not([const=true])",
-          message: "Don't declare non-const enums",
-        },
-      ],
     },
   },
 );

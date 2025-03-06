@@ -11,6 +11,7 @@
     "install-mafia": "create-kolmafia-script --install"
   },
   "dependencies": {
+    "grimoire-kolmafia": "^0.3.29",
     "kolmafia": "latest",
     "libram": "^0.10.1"
   },
