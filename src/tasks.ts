@@ -7,9 +7,10 @@ import * as Mining from "./mining";
 import { Mine } from "./mining";
 import {
   assureHotResistance,
+  explain,
+  findStartOfLongestVein,
   getAccessibleSparkles,
   mineCoordinate,
-  printExplanation,
 } from "./utils";
 
 export const MINING_TASKS: Task[] = [
@@ -98,19 +99,18 @@ export const MINING_TASKS: Task[] = [
     },
     do: () => {
       // Find a shiny spot in the second row we can aim for
-      // @todo We should try to find a spot that is part of a contiguous group of sparkly spots
-      const column = Mining.getState(Mine.VOLCANO).slice(-12, -6).indexOf("*");
-
-      if (column >= 0) {
-        printExplanation(`No * in row 6, saw * at (${column + 1},5), so aiming for that`);
-      } else {
-        printExplanation(`No * in row 6, picking random spot between (2,6) and (5,6)`);
-      }
+      const column = findStartOfLongestVein(Mining.getState(Mine.VOLCANO).slice(-12, -6));
 
       // Either use that column or pick a random spot in the middle of the front row
       // By picking a spot in the middle, an uncovered sparkly spot would itself
       // provide the chance of finding two more spots
       const coords = tuple(column >= 0 ? column + 1 : 2 + Math.floor(Math.random() * 4), 6);
+
+      if (column >= 0) {
+        explain(`No * in r6, longest vein of * starts at (${column + 1},5), aiming for that`);
+      } else {
+        explain(`No * in r6, picking random spot between (2,6) and (5,6)`);
+      }
 
       mineCoordinate(coords);
     },

@@ -14,7 +14,7 @@ export function printError(message: string): void {
   print(message, "red");
 }
 
-export function printExplanation(message: string): void {
+export function explain(message: string): void {
   if (!args.explain) return;
   printHtml(`<pre color="green">[EXPLAIN] ${message}</pre>`);
 }
@@ -28,7 +28,7 @@ export function assureHotResistance() {
 }
 
 export function mineCoordinate(coords: MiningCoordinate) {
-  printExplanation(
+  explain(
     `\n${Mining.getAsMatrix(Mine.VOLCANO)
       .map((row) => row.join(""))
       .join("\n")}\nPicked (${coords.join(",")})`,
@@ -39,4 +39,14 @@ export function mineCoordinate(coords: MiningCoordinate) {
 
 export function getAccessibleSparkles() {
   return Mining.getAccessibleSparkles(Mine.VOLCANO).filter(([, y]) => [5, 6].includes(y));
+}
+
+export function findStartOfLongestVein(layout: string) {
+  return (
+    [...Array(layout.length).fill(0)]
+      .map((_, i) => i)
+      .filter((i) => layout[i] === "*")
+      .map((i) => ({ i, size: layout.slice(i).match(/^(\*+)/)?.[1].length ?? 0 }))
+      .sort((a, b) => b.size - a.size)[0]?.i ?? -1
+  );
 }
