@@ -1,4 +1,4 @@
-# orea
+# oreo
 
 **oreo** is a script meant to farm 1,970 carat gold in [Kingdom of Loathing](https://www.kingdomofloathing.com/). It essentially mines as many twinkly spots in the front two rows of The Velvet / Gold Mine as it can with your hard earned adventures.
 
