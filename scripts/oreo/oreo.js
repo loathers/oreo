@@ -6168,14 +6168,14 @@ var MINING_TASKS = [{
   noCombat: !0,
   outfit: {
     equip: [$item(_templateObject511 || (_templateObject511 = _taggedTemplateLiteral8(["high-temperature mining drill"])))],
-    modifier: args.survive || (0, import_kolmafia15.myHp)() >= 75 ? "Hot Resistance" : "15Hot Resistance, hp regen"
+    modifier: "1000 Hot Resistance 15 max, HP Regen"
   },
   ready: function() {
     return getAccessibleSparkles2().length > 0;
   },
   prepare: function() {
     assureHotResistance();
-    var minHp = caveInCost(6);
+    var minHp = caveInCost(Mine.VOLCANO);
     if (args.survive && (0, import_kolmafia15.myHp)() < minHp) {
       var hpRestore = 2 * minHp + (0, import_kolmafia15.myHp)();
       (0, import_kolmafia15.restoreHp)(hpRestore) || (0, import_kolmafia15.abort)("Could not restore enough HP to survive the cave-in.");
@@ -6199,7 +6199,7 @@ var MINING_TASKS = [{
   outfit: function() {
     return {
       equip: [$item(_templateObject68 || (_templateObject68 = _taggedTemplateLiteral8(["high-temperature mining drill"])))].concat(_toConsumableArray11(have($item(_templateObject75 || (_templateObject75 = _taggedTemplateLiteral8(["Xiblaxian holo-wrist-puter"])))) && !get("_holoWristCrystal") ? [$item(_templateObject85 || (_templateObject85 = _taggedTemplateLiteral8(["Xiblaxian holo-wrist-puter"])))] : [])),
-      modifier: args.survive || (0, import_kolmafia15.myHp)() >= 75 ? "Hot Resistance" : "15Hot Resistance, hp regen"
+      modifier: "1000 Hot Resistance 15 max, HP Regen"
     };
   },
   acquire: [
@@ -6215,7 +6215,7 @@ var MINING_TASKS = [{
   },
   prepare: function() {
     assureHotResistance();
-    var minHp = caveInCost(6);
+    var minHp = caveInCost(Mine.VOLCANO);
     if (args.survive && (0, import_kolmafia15.myHp)() < minHp) {
       var hpRestore = 2 * minHp + (0, import_kolmafia15.myHp)();
       (0, import_kolmafia15.restoreHp)(hpRestore) || (0, import_kolmafia15.abort)("Could not restore enough HP to survive the cave-in.");
