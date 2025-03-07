@@ -6055,7 +6055,7 @@ _defineProperty10(MiningEngine, "defaultSettings", _objectSpread7(_objectSpread7
 // src/tasks.ts
 init_kolmafia_polyfill();
 var import_kolmafia15 = require("kolmafia");
-var _templateObject67, _templateObject217, _templateObject316, _templateObject414, _templateObject511, _templateObject68, _templateObject75, _templateObject85, _templateObject94;
+var _templateObject67, _templateObject217, _templateObject316, _templateObject414, _templateObject511, _templateObject68, _templateObject75, _templateObject85, _templateObject94, _templateObject104, _templateObject115, _templateObject125, _templateObject135, _templateObject145, _templateObject155, _templateObject165, _templateObject175;
 function _toConsumableArray11(r) {
   return _arrayWithoutHoles11(r) || _iterableToArray11(r) || _unsupportedIterableToArray15(r) || _nonIterableSpread11();
 }
@@ -6101,9 +6101,27 @@ var MINING_TASKS = [{
     return have($item(_templateObject414 || (_templateObject414 = _taggedTemplateLiteral8(["high-temperature mining drill"]))));
   }
 }, {
+  name: "Acquire hippy medical kit",
+  noCombat: !0,
+  limit: {
+    tries: 1
+  },
+  acquire: [{
+    item: $item(_templateObject511 || (_templateObject511 = _taggedTemplateLiteral8(["hippy medical kit"])))
+  }],
+  do: function() {
+  },
+  completed: function() {
+    return have($item(_templateObject68 || (_templateObject68 = _taggedTemplateLiteral8(["hippy medical kit"]))));
+  }
+}, {
   name: "Move to a new cavern having struck gold in this cavern",
   after: ["Acquire mining drill"],
   noCombat: !0,
+  outfit: {
+    equip: [$item(_templateObject75 || (_templateObject75 = _taggedTemplateLiteral8(["high-temperature mining drill"]))), $item(_templateObject85 || (_templateObject85 = _taggedTemplateLiteral8(["hippy medical kit"])))],
+    modifier: "Hot Resistance"
+  },
   ready: function() {
     return get("mineLayout6").includes("goldnugget");
   },
@@ -6120,6 +6138,10 @@ var MINING_TASKS = [{
   name: "Move to new cavern having mined once with no sparkly targets",
   after: ["Acquire mining drill"],
   noCombat: !0,
+  outfit: {
+    equip: [$item(_templateObject94 || (_templateObject94 = _taggedTemplateLiteral8(["high-temperature mining drill"]))), $item(_templateObject104 || (_templateObject104 = _taggedTemplateLiteral8(["hippy medical kit"])))],
+    modifier: "Hot Resistance"
+  },
   ready: function() {
     return minedSpots(Mine.VOLCANO) >= 1 && getAccessibleSparkles2().length === 0;
   },
@@ -6137,8 +6159,8 @@ var MINING_TASKS = [{
   after: ["Acquire mining drill"],
   noCombat: !0,
   outfit: {
-    equip: [$item(_templateObject511 || (_templateObject511 = _taggedTemplateLiteral8(["high-temperature mining drill"])))],
-    modifier: "1000 Hot Resistance 15 max, HP Regen"
+    equip: [$item(_templateObject115 || (_templateObject115 = _taggedTemplateLiteral8(["high-temperature mining drill"]))), $item(_templateObject125 || (_templateObject125 = _taggedTemplateLiteral8(["hippy medical kit"])))],
+    modifier: "Hot Resistance"
   },
   ready: function() {
     return getAccessibleSparkles2().length > 0;
@@ -6164,14 +6186,14 @@ var MINING_TASKS = [{
   noCombat: !0,
   outfit: function() {
     return {
-      equip: [$item(_templateObject68 || (_templateObject68 = _taggedTemplateLiteral8(["high-temperature mining drill"])))].concat(_toConsumableArray11(have($item(_templateObject75 || (_templateObject75 = _taggedTemplateLiteral8(["Xiblaxian holo-wrist-puter"])))) && !get("_holoWristCrystal") ? [$item(_templateObject85 || (_templateObject85 = _taggedTemplateLiteral8(["Xiblaxian holo-wrist-puter"])))] : [])),
-      modifier: "1000 Hot Resistance 15 max, HP Regen"
+      equip: [$item(_templateObject135 || (_templateObject135 = _taggedTemplateLiteral8(["high-temperature mining drill"]))), $item(_templateObject145 || (_templateObject145 = _taggedTemplateLiteral8(["hippy medical kit"])))].concat(_toConsumableArray11(have($item(_templateObject155 || (_templateObject155 = _taggedTemplateLiteral8(["Xiblaxian holo-wrist-puter"])))) && !get("_holoWristCrystal") ? [$item(_templateObject165 || (_templateObject165 = _taggedTemplateLiteral8(["Xiblaxian holo-wrist-puter"])))] : [])),
+      modifier: "Hot Resistance"
     };
   },
   acquire: [
     // Grab a minin' dynamite if it would save us compared to the value of an adventure here
     {
-      item: $item(_templateObject94 || (_templateObject94 = _taggedTemplateLiteral8(["minin' dynamite"]))),
+      item: $item(_templateObject175 || (_templateObject175 = _taggedTemplateLiteral8(["minin' dynamite"]))),
       price: get("valueOfAdventure") - 1,
       optional: !0
     }
