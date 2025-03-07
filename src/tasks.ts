@@ -51,13 +51,13 @@ export const MINING_TASKS: Task[] = [
     noCombat: true,
     outfit: {
       equip: [$item`high-temperature mining drill`],
-      modifier: args.survive || myHp() >= 75 ? "Hot Resistance" : "15Hot Resistance, hp regen",
+      modifier: "1000 Hot Resistance 15 max, HP Regen",
     },
     ready: () => getAccessibleSparkles().length > 0,
     prepare: () => {
       assureHotResistance();
 
-      const minHp = Mining.caveInCost(6);
+      const minHp = Mining.caveInCost(Mine.VOLCANO);
       if (args.survive && myHp() < minHp) {
         const hpRestore = 2 * minHp + myHp();
         if (!restoreHp(hpRestore)) abort("Could not restore enough HP to survive the cave-in.");
@@ -85,7 +85,7 @@ export const MINING_TASKS: Task[] = [
           ? [$item`Xiblaxian holo-wrist-puter`]
           : []),
       ],
-      modifier: args.survive || myHp() >= 75 ? "Hot Resistance" : "15Hot Resistance, hp regen",
+      modifier: "1000 Hot Resistance 15 max, HP Regen",
     }),
     acquire: [
       // Grab a minin' dynamite if it would save us compared to the value of an adventure here
@@ -95,7 +95,7 @@ export const MINING_TASKS: Task[] = [
     prepare: () => {
       assureHotResistance();
 
-      const minHp = Mining.caveInCost(6);
+      const minHp = Mining.caveInCost(Mine.VOLCANO);
       if (args.survive && myHp() < minHp) {
         const hpRestore = 2 * minHp + myHp();
         if (!restoreHp(hpRestore)) abort("Could not restore enough HP to survive the cave-in.");
