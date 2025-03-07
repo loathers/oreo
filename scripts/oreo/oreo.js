@@ -5607,13 +5607,228 @@ init_kolmafia_polyfill();
 
 // src/utils.ts
 init_kolmafia_polyfill();
+var import_kolmafia14 = require("kolmafia");
+
+// src/mining.ts
+init_kolmafia_polyfill();
 var import_kolmafia13 = require("kolmafia");
-function printHighlight(message) {
-  var color = (0, import_kolmafia13.isDarkMode)() ? "yellow" : "blue";
-  (0, import_kolmafia13.print)(message, color);
+var _templateObject315, _templateObject413, _templateObject510, _templateObject65, _templateObject74, _templateObject84;
+function _toConsumableArray9(r) {
+  return _arrayWithoutHoles9(r) || _iterableToArray9(r) || _unsupportedIterableToArray12(r) || _nonIterableSpread9();
 }
-function printExplanation(message) {
-  args.explain && (0, import_kolmafia13.printHtml)('<pre color="green">[EXPLAIN] '.concat(message, "</pre>"));
+function _nonIterableSpread9() {
+  throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
+}
+function _iterableToArray9(r) {
+  if (typeof Symbol < "u" && r[Symbol.iterator] != null || r["@@iterator"] != null) return Array.from(r);
+}
+function _arrayWithoutHoles9(r) {
+  if (Array.isArray(r)) return _arrayLikeToArray12(r);
+}
+function _slicedToArray7(r, e) {
+  return _arrayWithHoles7(r) || _iterableToArrayLimit7(r, e) || _unsupportedIterableToArray12(r, e) || _nonIterableRest7();
+}
+function _nonIterableRest7() {
+  throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
+}
+function _unsupportedIterableToArray12(r, a) {
+  if (r) {
+    if (typeof r == "string") return _arrayLikeToArray12(r, a);
+    var t = {}.toString.call(r).slice(8, -1);
+    return t === "Object" && r.constructor && (t = r.constructor.name), t === "Map" || t === "Set" ? Array.from(r) : t === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(t) ? _arrayLikeToArray12(r, a) : void 0;
+  }
+}
+function _arrayLikeToArray12(r, a) {
+  (a == null || a > r.length) && (a = r.length);
+  for (var e = 0, n = Array(a); e < a; e++) n[e] = r[e];
+  return n;
+}
+function _iterableToArrayLimit7(r, l) {
+  var t = r == null ? null : typeof Symbol < "u" && r[Symbol.iterator] || r["@@iterator"];
+  if (t != null) {
+    var e, n, i, u, a = [], f = !0, o = !1;
+    try {
+      if (i = (t = t.call(r)).next, l === 0) {
+        if (Object(t) !== t) return;
+        f = !1;
+      } else for (; !(f = (e = i.call(t)).done) && (a.push(e.value), a.length !== l); f = !0) ;
+    } catch (r2) {
+      o = !0, n = r2;
+    } finally {
+      try {
+        if (!f && t.return != null && (u = t.return(), Object(u) !== u)) return;
+      } finally {
+        if (o) throw n;
+      }
+    }
+    return a;
+  }
+}
+function _arrayWithHoles7(r) {
+  if (Array.isArray(r)) return r;
+}
+function _taggedTemplateLiteral6(e, t) {
+  return t || (t = e.slice(0)), Object.freeze(Object.defineProperties(e, { raw: { value: Object.freeze(t) } }));
+}
+var Mine = /* @__PURE__ */ function(Mine2) {
+  return Mine2[Mine2.ITZNOTYERZITZ = 1] = "ITZNOTYERZITZ", Mine2[Mine2.KNOB = 2] = "KNOB", Mine2[Mine2.ANEMONE = 3] = "ANEMONE", Mine2[Mine2.GUMMI = 4] = "GUMMI", Mine2[Mine2.CRIMBONIUM = 5] = "CRIMBONIUM", Mine2[Mine2.VOLCANO = 6] = "VOLCANO", Mine2;
+}({});
+function caveInCost(mine) {
+  switch (mine) {
+    case Mine.ITZNOTYERZITZ:
+    case Mine.GUMMI:
+    case Mine.CRIMBONIUM:
+      return (0, import_kolmafia13.myBuffedstat)($stat(_templateObject315 || (_templateObject315 = _taggedTemplateLiteral6(["muscle"])))) * 1.5;
+    case Mine.KNOB:
+      return (0, import_kolmafia13.myBuffedstat)($stat(_templateObject413 || (_templateObject413 = _taggedTemplateLiteral6(["muscle"])))) * 0.5;
+    case Mine.ANEMONE:
+      return (0, import_kolmafia13.myBuffedstat)($stat(_templateObject510 || (_templateObject510 = _taggedTemplateLiteral6(["muscle"])))) * 2.5;
+    case Mine.VOLCANO:
+      return damageTakenByElement(75, $element(_templateObject65 || (_templateObject65 = _taggedTemplateLiteral6(["hot"]))));
+    default:
+      return 0;
+  }
+}
+var stateIndexToCoord = function(position) {
+  var row = Math.floor(position / 6), col = position % 6;
+  return tuple(col + 1, row + 1);
+}, getAccessibleSparklesForIndex = function(state, index) {
+  var coords = stateIndexToCoord(index), col = coords[0] - 1, row = coords[1] - 1;
+  return row >= 5 && state[index] === "*" ? [coords] : state[index] !== "o" ? [] : [[-1, 0], [1, 0], [0, -1], [0, 1]].map(function(_ref) {
+    var _ref2 = _slicedToArray7(_ref, 2), dy = _ref2[0], dx = _ref2[1], y = col + dy, x = row + dx;
+    return x < 0 || x > 5 || y < 0 || y > 5 ? null : x * 6 + y;
+  }).filter(function(i) {
+    return i !== null;
+  }).filter(function(i) {
+    return state[i] === "*";
+  }).map(stateIndexToCoord);
+};
+function getAccessibleSparkles(mine) {
+  var state = get("mineState".concat(mine), "");
+  return _toConsumableArray9(Array(state.length).fill(0)).flatMap(function(v, position) {
+    return getAccessibleSparklesForIndex(state, position);
+  });
+}
+function minedSpots(mine) {
+  return get("mineState".concat(mine), "").split("").filter(function(c) {
+    return c === "o";
+  }).length;
+}
+function findNewCavern(mine) {
+  return (0, import_kolmafia13.visitUrl)("mining.php?mine=".concat(mine, "&reset=1&pwd"), !0);
+}
+function mineCoordinate(mine, _ref3) {
+  var _ref4 = _slicedToArray7(_ref3, 2), col = _ref4[0], row = _ref4[1], page = (0, import_kolmafia13.visitUrl)("mining.php?mine=".concat(mine, "&which=").concat(col + 8 * row, "&pwd"), !0);
+  return extractItems(page);
+}
+function visit(mine) {
+  return (0, import_kolmafia13.visitUrl)("mining.php?mine=".concat(mine));
+}
+function getState(mine) {
+  return get("mineState".concat(mine), "");
+}
+function getAsMatrix(mine) {
+  return chunk(getState(mine).split(""), 6);
+}
+function countFreeMines() {
+  return (have($skill(_templateObject74 || (_templateObject74 = _taggedTemplateLiteral6(["Unaccompanied Miner"])))) ? 5 - get("_unaccompaniedMinerUsed") : 0) + (0, import_kolmafia13.haveEffect)($effect(_templateObject84 || (_templateObject84 = _taggedTemplateLiteral6(["Loded"]))));
+}
+
+// src/utils.ts
+var _templateObject66, _templateObject216;
+function _toConsumableArray10(r) {
+  return _arrayWithoutHoles10(r) || _iterableToArray10(r) || _unsupportedIterableToArray13(r) || _nonIterableSpread10();
+}
+function _nonIterableSpread10() {
+  throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
+}
+function _iterableToArray10(r) {
+  if (typeof Symbol < "u" && r[Symbol.iterator] != null || r["@@iterator"] != null) return Array.from(r);
+}
+function _arrayWithoutHoles10(r) {
+  if (Array.isArray(r)) return _arrayLikeToArray13(r);
+}
+function _slicedToArray8(r, e) {
+  return _arrayWithHoles8(r) || _iterableToArrayLimit8(r, e) || _unsupportedIterableToArray13(r, e) || _nonIterableRest8();
+}
+function _nonIterableRest8() {
+  throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
+}
+function _unsupportedIterableToArray13(r, a) {
+  if (r) {
+    if (typeof r == "string") return _arrayLikeToArray13(r, a);
+    var t = {}.toString.call(r).slice(8, -1);
+    return t === "Object" && r.constructor && (t = r.constructor.name), t === "Map" || t === "Set" ? Array.from(r) : t === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(t) ? _arrayLikeToArray13(r, a) : void 0;
+  }
+}
+function _arrayLikeToArray13(r, a) {
+  (a == null || a > r.length) && (a = r.length);
+  for (var e = 0, n = Array(a); e < a; e++) n[e] = r[e];
+  return n;
+}
+function _iterableToArrayLimit8(r, l) {
+  var t = r == null ? null : typeof Symbol < "u" && r[Symbol.iterator] || r["@@iterator"];
+  if (t != null) {
+    var e, n, i, u, a = [], f = !0, o = !1;
+    try {
+      if (i = (t = t.call(r)).next, l === 0) {
+        if (Object(t) !== t) return;
+        f = !1;
+      } else for (; !(f = (e = i.call(t)).done) && (a.push(e.value), a.length !== l); f = !0) ;
+    } catch (r2) {
+      o = !0, n = r2;
+    } finally {
+      try {
+        if (!f && t.return != null && (u = t.return(), Object(u) !== u)) return;
+      } finally {
+        if (o) throw n;
+      }
+    }
+    return a;
+  }
+}
+function _arrayWithHoles8(r) {
+  if (Array.isArray(r)) return r;
+}
+function _taggedTemplateLiteral7(e, t) {
+  return t || (t = e.slice(0)), Object.freeze(Object.defineProperties(e, { raw: { value: Object.freeze(t) } }));
+}
+function printHighlight(message) {
+  var color = (0, import_kolmafia14.isDarkMode)() ? "yellow" : "blue";
+  (0, import_kolmafia14.print)(message, color);
+}
+function explain(message) {
+  args.explain && (0, import_kolmafia14.printHtml)('<pre color="green">[EXPLAIN] '.concat(message, "</pre>"));
+}
+function assureHotResistance() {
+  (0, import_kolmafia14.numericModifier)($modifier(_templateObject66 || (_templateObject66 = _taggedTemplateLiteral7(["Hot Resistance"])))) < 15 && (0, import_kolmafia14.abort)("More hot resistance needed (you have ".concat((0, import_kolmafia14.numericModifier)($modifier(_templateObject216 || (_templateObject216 = _taggedTemplateLiteral7(["Hot Resistance"])))), ", you need 15)."));
+}
+function mineCoordinate2(coords) {
+  explain("\n".concat(getAsMatrix(Mine.VOLCANO).map(function(row) {
+    return row.join("");
+  }).join("\n"), "\nPicked (").concat(coords.join(","), ")")), mineCoordinate(Mine.VOLCANO, coords);
+}
+function getAccessibleSparkles2() {
+  return getAccessibleSparkles(Mine.VOLCANO).filter(function(_ref) {
+    var _ref2 = _slicedToArray8(_ref, 2), y = _ref2[1];
+    return [5, 6].includes(y);
+  });
+}
+function findStartOfLongestVein(layout) {
+  var _map$filter$map$sort$, _map$filter$map$sort$2;
+  return (_map$filter$map$sort$ = (_map$filter$map$sort$2 = _toConsumableArray10(Array(layout.length).fill(0)).map(function(_, i) {
+    return i;
+  }).filter(function(i) {
+    return layout[i] === "*";
+  }).map(function(i) {
+    var _layout$slice$match$, _layout$slice$match;
+    return {
+      i: i,
+      size: (_layout$slice$match$ = (_layout$slice$match = layout.slice(i).match(/^(\*+)/)) === null || _layout$slice$match === void 0 ? void 0 : _layout$slice$match[1].length) !== null && _layout$slice$match$ !== void 0 ? _layout$slice$match$ : 0
+    };
+  }).sort(function(a, b) {
+    return b.size - a.size;
+  })[0]) === null || _map$filter$map$sort$2 === void 0 ? void 0 : _map$filter$map$sort$2.i) !== null && _map$filter$map$sort$ !== void 0 ? _map$filter$map$sort$ : -1;
 }
 
 // src/engine.ts
@@ -5646,13 +5861,13 @@ function _typeof13(o) {
     return o2 && typeof Symbol == "function" && o2.constructor === Symbol && o2 !== Symbol.prototype ? "symbol" : typeof o2;
   }, _typeof13(o);
 }
-function _slicedToArray7(r, e) {
-  return _arrayWithHoles7(r) || _iterableToArrayLimit7(r, e) || _unsupportedIterableToArray12(r, e) || _nonIterableRest7();
+function _slicedToArray9(r, e) {
+  return _arrayWithHoles9(r) || _iterableToArrayLimit9(r, e) || _unsupportedIterableToArray14(r, e) || _nonIterableRest9();
 }
-function _nonIterableRest7() {
+function _nonIterableRest9() {
   throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
 }
-function _iterableToArrayLimit7(r, l) {
+function _iterableToArrayLimit9(r, l) {
   var t = r == null ? null : typeof Symbol < "u" && r[Symbol.iterator] || r["@@iterator"];
   if (t != null) {
     var e, n, i, u, a = [], f = !0, o = !1;
@@ -5673,13 +5888,13 @@ function _iterableToArrayLimit7(r, l) {
     return a;
   }
 }
-function _arrayWithHoles7(r) {
+function _arrayWithHoles9(r) {
   if (Array.isArray(r)) return r;
 }
 function _createForOfIteratorHelper11(r, e) {
   var t = typeof Symbol < "u" && r[Symbol.iterator] || r["@@iterator"];
   if (!t) {
-    if (Array.isArray(r) || (t = _unsupportedIterableToArray12(r)) || e && r && typeof r.length == "number") {
+    if (Array.isArray(r) || (t = _unsupportedIterableToArray14(r)) || e && r && typeof r.length == "number") {
       t && (r = t);
       var _n = 0, F = function() {
       };
@@ -5707,14 +5922,14 @@ function _createForOfIteratorHelper11(r, e) {
     }
   } };
 }
-function _unsupportedIterableToArray12(r, a) {
+function _unsupportedIterableToArray14(r, a) {
   if (r) {
-    if (typeof r == "string") return _arrayLikeToArray12(r, a);
+    if (typeof r == "string") return _arrayLikeToArray14(r, a);
     var t = {}.toString.call(r).slice(8, -1);
-    return t === "Object" && r.constructor && (t = r.constructor.name), t === "Map" || t === "Set" ? Array.from(r) : t === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(t) ? _arrayLikeToArray12(r, a) : void 0;
+    return t === "Object" && r.constructor && (t = r.constructor.name), t === "Map" || t === "Set" ? Array.from(r) : t === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(t) ? _arrayLikeToArray14(r, a) : void 0;
   }
 }
-function _arrayLikeToArray12(r, a) {
+function _arrayLikeToArray14(r, a) {
   (a == null || a > r.length) && (a = r.length);
   for (var e = 0, n = Array(a); e < a; e++) n[e] = r[e];
   return n;
@@ -5817,7 +6032,7 @@ var MiningEngine = /* @__PURE__ */ function(_Engine) {
       var _iterator = _createForOfIteratorHelper11(diff.items), _step;
       try {
         for (_iterator.s(); !(_step = _iterator.n()).done; ) {
-          var _step$value = _slicedToArray7(_step.value, 2), item = _step$value[0], quantity = _step$value[1];
+          var _step$value = _slicedToArray9(_step.value, 2), item = _step$value[0], quantity = _step$value[1];
           printHighlight(" ".concat(item, ": ").concat(quantity));
         }
       } catch (err) {
@@ -5837,254 +6052,15 @@ _defineProperty10(MiningEngine, "defaultSettings", _objectSpread7(_objectSpread7
   logPreferenceChangeFilter: "".concat(Engine.defaultSettings.logPreferenceChangeFilter, ",mineLayout6,mineState6,lastAdventure")
 }));
 
-// src/mining.ts
-init_kolmafia_polyfill();
-var import_kolmafia14 = require("kolmafia");
-var _templateObject315, _templateObject413, _templateObject510, _templateObject65, _templateObject74, _templateObject84;
-function _toConsumableArray9(r) {
-  return _arrayWithoutHoles9(r) || _iterableToArray9(r) || _unsupportedIterableToArray13(r) || _nonIterableSpread9();
-}
-function _nonIterableSpread9() {
-  throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
-}
-function _iterableToArray9(r) {
-  if (typeof Symbol < "u" && r[Symbol.iterator] != null || r["@@iterator"] != null) return Array.from(r);
-}
-function _arrayWithoutHoles9(r) {
-  if (Array.isArray(r)) return _arrayLikeToArray13(r);
-}
-function _slicedToArray8(r, e) {
-  return _arrayWithHoles8(r) || _iterableToArrayLimit8(r, e) || _unsupportedIterableToArray13(r, e) || _nonIterableRest8();
-}
-function _nonIterableRest8() {
-  throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
-}
-function _unsupportedIterableToArray13(r, a) {
-  if (r) {
-    if (typeof r == "string") return _arrayLikeToArray13(r, a);
-    var t = {}.toString.call(r).slice(8, -1);
-    return t === "Object" && r.constructor && (t = r.constructor.name), t === "Map" || t === "Set" ? Array.from(r) : t === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(t) ? _arrayLikeToArray13(r, a) : void 0;
-  }
-}
-function _arrayLikeToArray13(r, a) {
-  (a == null || a > r.length) && (a = r.length);
-  for (var e = 0, n = Array(a); e < a; e++) n[e] = r[e];
-  return n;
-}
-function _iterableToArrayLimit8(r, l) {
-  var t = r == null ? null : typeof Symbol < "u" && r[Symbol.iterator] || r["@@iterator"];
-  if (t != null) {
-    var e, n, i, u, a = [], f = !0, o = !1;
-    try {
-      if (i = (t = t.call(r)).next, l === 0) {
-        if (Object(t) !== t) return;
-        f = !1;
-      } else for (; !(f = (e = i.call(t)).done) && (a.push(e.value), a.length !== l); f = !0) ;
-    } catch (r2) {
-      o = !0, n = r2;
-    } finally {
-      try {
-        if (!f && t.return != null && (u = t.return(), Object(u) !== u)) return;
-      } finally {
-        if (o) throw n;
-      }
-    }
-    return a;
-  }
-}
-function _arrayWithHoles8(r) {
-  if (Array.isArray(r)) return r;
-}
-function _taggedTemplateLiteral6(e, t) {
-  return t || (t = e.slice(0)), Object.freeze(Object.defineProperties(e, { raw: { value: Object.freeze(t) } }));
-}
-var Mine = /* @__PURE__ */ function(Mine2) {
-  return Mine2[Mine2.ITZNOTYERZITZ = 1] = "ITZNOTYERZITZ", Mine2[Mine2.KNOB = 2] = "KNOB", Mine2[Mine2.ANEMONE = 3] = "ANEMONE", Mine2[Mine2.GUMMI = 4] = "GUMMI", Mine2[Mine2.CRIMBONIUM = 5] = "CRIMBONIUM", Mine2[Mine2.VOLCANO = 6] = "VOLCANO", Mine2;
-}({});
-function caveInCost(mine) {
-  switch (mine) {
-    case Mine.ITZNOTYERZITZ:
-    case Mine.GUMMI:
-    case Mine.CRIMBONIUM:
-      return (0, import_kolmafia14.myBuffedstat)($stat(_templateObject315 || (_templateObject315 = _taggedTemplateLiteral6(["muscle"])))) * 1.5;
-    case Mine.KNOB:
-      return (0, import_kolmafia14.myBuffedstat)($stat(_templateObject413 || (_templateObject413 = _taggedTemplateLiteral6(["muscle"])))) * 0.5;
-    case Mine.ANEMONE:
-      return (0, import_kolmafia14.myBuffedstat)($stat(_templateObject510 || (_templateObject510 = _taggedTemplateLiteral6(["muscle"])))) * 2.5;
-    case Mine.VOLCANO:
-      return damageTakenByElement(75, $element(_templateObject65 || (_templateObject65 = _taggedTemplateLiteral6(["hot"]))));
-    default:
-      return 0;
-  }
-}
-var stateIndexToCoord = function(position) {
-  var row = Math.floor(position / 6), col = position % 6;
-  return tuple(col + 1, row + 1);
-}, getAccessibleSparklesForIndex = function(state, index) {
-  var coords = stateIndexToCoord(index), col = coords[0] - 1, row = coords[1] - 1;
-  return row >= 5 && state[index] === "*" ? [coords] : state[index] !== "o" ? [] : [[-1, 0], [1, 0], [0, -1], [0, 1]].map(function(_ref) {
-    var _ref2 = _slicedToArray8(_ref, 2), dy = _ref2[0], dx = _ref2[1], y = col + dy, x = row + dx;
-    return x < 0 || x > 5 || y < 0 || y > 5 ? null : x * 6 + y;
-  }).filter(function(i) {
-    return i !== null;
-  }).filter(function(i) {
-    return state[i] === "*";
-  }).map(stateIndexToCoord);
-};
-function getAccessibleSparkles(mine) {
-  var state = get("mineState".concat(mine), "");
-  return _toConsumableArray9(Array(state.length).fill(0)).flatMap(function(v, position) {
-    return getAccessibleSparklesForIndex(state, position);
-  });
-}
-function minedSpots(mine) {
-  return get("mineState".concat(mine), "").split("").filter(function(c) {
-    return c === "o";
-  }).length;
-}
-function findNewCavern(mine) {
-  return (0, import_kolmafia14.visitUrl)("mining.php?mine=".concat(mine, "&reset=1&pwd"), !0);
-}
-function mineCoordinate(mine, _ref3) {
-  var _ref4 = _slicedToArray8(_ref3, 2), col = _ref4[0], row = _ref4[1], page = (0, import_kolmafia14.visitUrl)("mining.php?mine=".concat(mine, "&which=").concat(col + 8 * row, "&pwd"), !0);
-  return extractItems(page);
-}
-function visit(mine) {
-  return (0, import_kolmafia14.visitUrl)("mining.php?mine=".concat(mine));
-}
-function getState(mine) {
-  return get("mineState".concat(mine), "");
-}
-function getAsMatrix(mine) {
-  return chunk(getState(mine).split(""), 6);
-}
-function countFreeMines() {
-  return (have($skill(_templateObject74 || (_templateObject74 = _taggedTemplateLiteral6(["Unaccompanied Miner"])))) ? 5 - get("_unaccompaniedMinerUsed") : 0) + (0, import_kolmafia14.haveEffect)($effect(_templateObject84 || (_templateObject84 = _taggedTemplateLiteral6(["Loded"]))));
-}
-
 // src/tasks.ts
 init_kolmafia_polyfill();
 var import_kolmafia15 = require("kolmafia");
-var _templateObject66, _templateObject216, _templateObject316, _templateObject414, _templateObject511, _templateObject67, _templateObject75, _templateObject85, _templateObject94, _templateObject104;
-function _slicedToArray9(r, e) {
-  return _arrayWithHoles9(r) || _iterableToArrayLimit9(r, e) || _unsupportedIterableToArray14(r, e) || _nonIterableRest9();
+var _templateObject67, _templateObject217, _templateObject316, _templateObject414, _templateObject511, _templateObject68, _templateObject75;
+function _slicedToArray10(r, e) {
+  return _arrayWithHoles10(r) || _iterableToArrayLimit10(r, e) || _unsupportedIterableToArray15(r, e) || _nonIterableRest10();
 }
-function _nonIterableRest9() {
+function _nonIterableRest10() {
   throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
-}
-function _unsupportedIterableToArray14(r, a) {
-  if (r) {
-    if (typeof r == "string") return _arrayLikeToArray14(r, a);
-    var t = {}.toString.call(r).slice(8, -1);
-    return t === "Object" && r.constructor && (t = r.constructor.name), t === "Map" || t === "Set" ? Array.from(r) : t === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(t) ? _arrayLikeToArray14(r, a) : void 0;
-  }
-}
-function _arrayLikeToArray14(r, a) {
-  (a == null || a > r.length) && (a = r.length);
-  for (var e = 0, n = Array(a); e < a; e++) n[e] = r[e];
-  return n;
-}
-function _iterableToArrayLimit9(r, l) {
-  var t = r == null ? null : typeof Symbol < "u" && r[Symbol.iterator] || r["@@iterator"];
-  if (t != null) {
-    var e, n, i, u, a = [], f = !0, o = !1;
-    try {
-      if (i = (t = t.call(r)).next, l === 0) {
-        if (Object(t) !== t) return;
-        f = !1;
-      } else for (; !(f = (e = i.call(t)).done) && (a.push(e.value), a.length !== l); f = !0) ;
-    } catch (r2) {
-      o = !0, n = r2;
-    } finally {
-      try {
-        if (!f && t.return != null && (u = t.return(), Object(u) !== u)) return;
-      } finally {
-        if (o) throw n;
-      }
-    }
-    return a;
-  }
-}
-function _arrayWithHoles9(r) {
-  if (Array.isArray(r)) return r;
-}
-function _taggedTemplateLiteral7(e, t) {
-  return t || (t = e.slice(0)), Object.freeze(Object.defineProperties(e, { raw: { value: Object.freeze(t) } }));
-}
-var MINING_TASKS = [{
-  name: "Acquire mining drill",
-  noCombat: !0,
-  completed: function() {
-    return have($item(_templateObject66 || (_templateObject66 = _taggedTemplateLiteral7(["high-temperature mining drill"]))));
-  },
-  limit: {
-    tries: 1
-  },
-  acquire: [{
-    item: $item(_templateObject216 || (_templateObject216 = _taggedTemplateLiteral7(["heat-resistant sheet metal"])))
-  }, {
-    item: $item(_templateObject316 || (_templateObject316 = _taggedTemplateLiteral7(["broken high-temperature mining drill"])))
-  }],
-  do: function() {
-    (0, import_kolmafia15.use)(1, $item(_templateObject414 || (_templateObject414 = _taggedTemplateLiteral7(["broken high-temperature mining drill"]))));
-  }
-}, {
-  after: ["Acquire mining drill"],
-  noCombat: !0,
-  name: "Mine",
-  completed: function() {
-    return !1;
-  },
-  outfit: {
-    equip: [$item(_templateObject511 || (_templateObject511 = _taggedTemplateLiteral7(["high-temperature mining drill"])))],
-    modifier: args.survive || (0, import_kolmafia15.myHp)() >= 75 ? "Hot Resistance" : "15Hot Resistance, hp regen"
-  },
-  prepare: function() {
-    (0, import_kolmafia15.numericModifier)($modifier(_templateObject67 || (_templateObject67 = _taggedTemplateLiteral7(["Hot Resistance"])))) < 15 && (0, import_kolmafia15.abort)("More hot resistance needed (you have ".concat((0, import_kolmafia15.numericModifier)($modifier(_templateObject75 || (_templateObject75 = _taggedTemplateLiteral7(["Hot Resistance"])))), ", you need 15)."));
-    var minHp = caveInCost(6);
-    if (args.survive && (0, import_kolmafia15.myHp)() < minHp) {
-      var hpRestore = 2 * minHp + (0, import_kolmafia15.myHp)();
-      (0, import_kolmafia15.restoreHp)(hpRestore) || (0, import_kolmafia15.abort)("Could not restore enough HP to survive the cave-in.");
-    }
-    (0, import_kolmafia15.myHp)() === 0 && (0, import_kolmafia15.abort)("You must have at least 1HP to mine.");
-  },
-  do: function() {
-    var mined = minedSpots(Mine.VOLCANO), sparkles = getAccessibleSparkles(Mine.VOLCANO);
-    if (mined >= 2) {
-      args.explain && printExplanation("Two o, moving on"), findNewCavern(Mine.VOLCANO);
-      return;
-    }
-    var coords = sparkles.filter(function(_ref) {
-      var _ref2 = _slicedToArray9(_ref, 2), y = _ref2[1];
-      return [5, 6].includes(y);
-    }).sort(function(_ref3, _ref4) {
-      var _ref5 = _slicedToArray9(_ref3, 2), y1 = _ref5[1], _ref6 = _slicedToArray9(_ref4, 2), y2 = _ref6[1];
-      return y1 - y2;
-    })[0];
-    if (!coords && mined >= 1) {
-      printExplanation("One o but no *, moving on"), findNewCavern(Mine.VOLCANO);
-      return;
-    }
-    if (!coords) {
-      (0, import_kolmafia15.retrievePrice)($item(_templateObject85 || (_templateObject85 = _taggedTemplateLiteral7(["minin' dynamite"])))) < get("valueOfAdventure") && (0, import_kolmafia15.retrieveItem)($item(_templateObject94 || (_templateObject94 = _taggedTemplateLiteral7(["minin' dynamite"]))));
-      var column = getState(Mine.VOLCANO).slice(-12, -6).indexOf("*");
-      column >= 0 ? printExplanation("No * in row 6, saw * at (".concat(column + 1, ",5), so aiming for that")) : printExplanation("No * in row 6, picking random spot between (2,6) and (5,6)"), coords = tuple(column >= 0 ? column + 1 : 2 + Math.floor(Math.random() * 4), 6);
-    }
-    printExplanation("\n".concat(getAsMatrix(Mine.VOLCANO).map(function(row) {
-      return row.join("");
-    }).join("\n"), "\nPicked (").concat(coords.join(","), ")"));
-    var results = mineCoordinate(Mine.VOLCANO, coords);
-    results.has($item(_templateObject104 || (_templateObject104 = _taggedTemplateLiteral7(["1,970 carat gold"])))) && (printExplanation("Found prize, moving on"), findNewCavern(Mine.VOLCANO));
-  }
-}];
-
-// src/main.ts
-var _templateObject68;
-function _toConsumableArray10(r) {
-  return _arrayWithoutHoles10(r) || _iterableToArray10(r) || _unsupportedIterableToArray15(r) || _nonIterableSpread10();
-}
-function _nonIterableSpread10() {
-  throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
 }
 function _unsupportedIterableToArray15(r, a) {
   if (r) {
@@ -6093,18 +6069,181 @@ function _unsupportedIterableToArray15(r, a) {
     return t === "Object" && r.constructor && (t = r.constructor.name), t === "Map" || t === "Set" ? Array.from(r) : t === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(t) ? _arrayLikeToArray15(r, a) : void 0;
   }
 }
-function _iterableToArray10(r) {
-  if (typeof Symbol < "u" && r[Symbol.iterator] != null || r["@@iterator"] != null) return Array.from(r);
-}
-function _arrayWithoutHoles10(r) {
-  if (Array.isArray(r)) return _arrayLikeToArray15(r);
-}
 function _arrayLikeToArray15(r, a) {
   (a == null || a > r.length) && (a = r.length);
   for (var e = 0, n = Array(a); e < a; e++) n[e] = r[e];
   return n;
 }
+function _iterableToArrayLimit10(r, l) {
+  var t = r == null ? null : typeof Symbol < "u" && r[Symbol.iterator] || r["@@iterator"];
+  if (t != null) {
+    var e, n, i, u, a = [], f = !0, o = !1;
+    try {
+      if (i = (t = t.call(r)).next, l === 0) {
+        if (Object(t) !== t) return;
+        f = !1;
+      } else for (; !(f = (e = i.call(t)).done) && (a.push(e.value), a.length !== l); f = !0) ;
+    } catch (r2) {
+      o = !0, n = r2;
+    } finally {
+      try {
+        if (!f && t.return != null && (u = t.return(), Object(u) !== u)) return;
+      } finally {
+        if (o) throw n;
+      }
+    }
+    return a;
+  }
+}
+function _arrayWithHoles10(r) {
+  if (Array.isArray(r)) return r;
+}
 function _taggedTemplateLiteral8(e, t) {
+  return t || (t = e.slice(0)), Object.freeze(Object.defineProperties(e, { raw: { value: Object.freeze(t) } }));
+}
+var MINING_TASKS = [{
+  name: "Acquire mining drill",
+  noCombat: !0,
+  limit: {
+    tries: 1
+  },
+  acquire: [{
+    item: $item(_templateObject67 || (_templateObject67 = _taggedTemplateLiteral8(["heat-resistant sheet metal"])))
+  }, {
+    item: $item(_templateObject217 || (_templateObject217 = _taggedTemplateLiteral8(["broken high-temperature mining drill"])))
+  }],
+  do: function() {
+    (0, import_kolmafia15.use)(1, $item(_templateObject316 || (_templateObject316 = _taggedTemplateLiteral8(["broken high-temperature mining drill"]))));
+  },
+  completed: function() {
+    return have($item(_templateObject414 || (_templateObject414 = _taggedTemplateLiteral8(["high-temperature mining drill"]))));
+  }
+}, {
+  name: "Move to a new cavern having struck gold in this cavern",
+  after: ["Acquire mining drill"],
+  noCombat: !0,
+  ready: function() {
+    return get("mineLayout6").includes("goldnugget");
+  },
+  prepare: function() {
+    return assureHotResistance();
+  },
+  do: function() {
+    return findNewCavern(Mine.VOLCANO);
+  },
+  completed: function() {
+    return !1;
+  }
+}, {
+  name: "Move to new cavern having mined once with no sparkly targets",
+  after: ["Acquire mining drill"],
+  noCombat: !0,
+  ready: function() {
+    return minedSpots(Mine.VOLCANO) >= 1 && getAccessibleSparkles2().length === 0;
+  },
+  prepare: function() {
+    return assureHotResistance();
+  },
+  do: function() {
+    return findNewCavern(Mine.VOLCANO);
+  },
+  completed: function() {
+    return !1;
+  }
+}, {
+  name: "Mine a sparkly spot",
+  after: ["Acquire mining drill"],
+  noCombat: !0,
+  outfit: {
+    equip: [$item(_templateObject511 || (_templateObject511 = _taggedTemplateLiteral8(["high-temperature mining drill"])))],
+    modifier: args.survive || (0, import_kolmafia15.myHp)() >= 75 ? "Hot Resistance" : "15Hot Resistance, hp regen"
+  },
+  ready: function() {
+    return getAccessibleSparkles2().length > 0;
+  },
+  prepare: function() {
+    assureHotResistance();
+    var minHp = caveInCost(6);
+    if (args.survive && (0, import_kolmafia15.myHp)() < minHp) {
+      var hpRestore = 2 * minHp + (0, import_kolmafia15.myHp)();
+      (0, import_kolmafia15.restoreHp)(hpRestore) || (0, import_kolmafia15.abort)("Could not restore enough HP to survive the cave-in.");
+    }
+    (0, import_kolmafia15.myHp)() === 0 && (0, import_kolmafia15.abort)("You must have at least 1HP to mine.");
+  },
+  do: function() {
+    var coord = getAccessibleSparkles2().filter(function(_ref) {
+      var _ref2 = _slicedToArray10(_ref, 2), y = _ref2[1];
+      return [5, 6].includes(y);
+    })[0];
+    mineCoordinate2(coord);
+  },
+  completed: function() {
+    return !1;
+  }
+}, {
+  name: "Mine a regular spot",
+  after: ["Acquire mining drill"],
+  noCombat: !0,
+  outfit: {
+    equip: [$item(_templateObject68 || (_templateObject68 = _taggedTemplateLiteral8(["high-temperature mining drill"])))],
+    modifier: args.survive || (0, import_kolmafia15.myHp)() >= 75 ? "Hot Resistance" : "15Hot Resistance, hp regen"
+  },
+  acquire: [
+    // Grab a minin' dynamite if it would save us compared to the value of an adventure here
+    {
+      item: $item(_templateObject75 || (_templateObject75 = _taggedTemplateLiteral8(["minin' dynamite"]))),
+      price: get("valueOfAdventure") - 1,
+      optional: !0
+    }
+  ],
+  ready: function() {
+    return minedSpots(Mine.VOLCANO) === 0 && getAccessibleSparkles2().length === 0;
+  },
+  prepare: function() {
+    assureHotResistance();
+    var minHp = caveInCost(6);
+    if (args.survive && (0, import_kolmafia15.myHp)() < minHp) {
+      var hpRestore = 2 * minHp + (0, import_kolmafia15.myHp)();
+      (0, import_kolmafia15.restoreHp)(hpRestore) || (0, import_kolmafia15.abort)("Could not restore enough HP to survive the cave-in.");
+    }
+    (0, import_kolmafia15.myHp)() === 0 && (0, import_kolmafia15.abort)("You must have at least 1HP to mine.");
+  },
+  do: function() {
+    var column = findStartOfLongestVein(getState(Mine.VOLCANO).slice(-12, -6)), coords = tuple(column >= 0 ? column + 1 : 2 + Math.floor(Math.random() * 4), 6);
+    column >= 0 ? explain("No * in r6, longest vein of * starts at (".concat(column + 1, ",5), aiming for that")) : explain("No * in r6, picking random spot between (2,6) and (5,6)"), mineCoordinate2(coords);
+  },
+  completed: function() {
+    return !1;
+  }
+}];
+
+// src/main.ts
+var _templateObject69;
+function _toConsumableArray11(r) {
+  return _arrayWithoutHoles11(r) || _iterableToArray11(r) || _unsupportedIterableToArray16(r) || _nonIterableSpread11();
+}
+function _nonIterableSpread11() {
+  throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
+}
+function _unsupportedIterableToArray16(r, a) {
+  if (r) {
+    if (typeof r == "string") return _arrayLikeToArray16(r, a);
+    var t = {}.toString.call(r).slice(8, -1);
+    return t === "Object" && r.constructor && (t = r.constructor.name), t === "Map" || t === "Set" ? Array.from(r) : t === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(t) ? _arrayLikeToArray16(r, a) : void 0;
+  }
+}
+function _iterableToArray11(r) {
+  if (typeof Symbol < "u" && r[Symbol.iterator] != null || r["@@iterator"] != null) return Array.from(r);
+}
+function _arrayWithoutHoles11(r) {
+  if (Array.isArray(r)) return _arrayLikeToArray16(r);
+}
+function _arrayLikeToArray16(r, a) {
+  (a == null || a > r.length) && (a = r.length);
+  for (var e = 0, n = Array(a); e < a; e++) n[e] = r[e];
+  return n;
+}
+function _taggedTemplateLiteral9(e, t) {
   return t || (t = e.slice(0)), Object.freeze(Object.defineProperties(e, { raw: { value: Object.freeze(t) } }));
 }
 function main() {
@@ -6120,13 +6259,13 @@ function main() {
     ready: function() {
       return (
         // Indicative of access to the 70s Volcano
-        (0, import_kolmafia16.canAdventure)($location(_templateObject68 || (_templateObject68 = _taggedTemplateLiteral8(["The SMOOCH Army HQ"])))) && (0, import_kolmafia16.myInebriety)() <= (0, import_kolmafia16.inebrietyLimit)() && (0, import_kolmafia16.myAdventures)() > 0
+        (0, import_kolmafia16.canAdventure)($location(_templateObject69 || (_templateObject69 = _taggedTemplateLiteral9(["The SMOOCH Army HQ"])))) && (0, import_kolmafia16.myInebriety)() <= (0, import_kolmafia16.inebrietyLimit)() && (0, import_kolmafia16.myAdventures)() > 0
       );
     },
     completed: function() {
       return (0, import_kolmafia16.totalTurnsPlayed)() >= stopAtTurn && countFreeMines() === 0;
     },
-    tasks: _toConsumableArray10(MINING_TASKS)
+    tasks: _toConsumableArray11(MINING_TASKS)
   }, engine = new MiningEngine(getTasks([quest]));
   try {
     engine.run();
