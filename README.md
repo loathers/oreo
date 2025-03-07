@@ -1,25 +1,37 @@
-# oreo
+# orea
 
-That 70s Volcano mining script! ⛏️
+**oreo** is a script meant to farm 1,970 carat gold in [Kingdom of Loathing](https://www.kingdomofloathing.com/). It essentially mines as many twinkly spots in the front two rows of The Velvet / Gold Mine as it can with your hard earned adventures.
 
-# Development
+To install, run the following command on an up-to-date KoLmafia version:
 
-First turn your TypeScript files into something KoLmafia can understand by running
-
-```bash
-yarn run build
+```
+git checkout loathers/oreo release
 ```
 
-Then you can automatically create symlinks to your built files by running
+## Running oreo
 
-```bash
-yarn run install-mafia
+In its simplest form, running oreo just requires running the following command in the KoLmafia gCLI:
+
+```
+oreo 10
 ```
 
-When you're developing you can have your files automatically rebuild by keeping
+Where "10" would be replaced by an integer telling the script how many turns you would like to spend mining. If you do not include a number after `oreo`, the script will just run until you're out of adventures. If you would like to use only your free mining skills, provide "0".
 
-```bash
-yarn run watch
+```
+oreo help
 ```
 
-running in the background. If you've already built symlinks, your up-to-date script can be run instantly by entering `oreo` into the KoLmafia CLI.
+Will list additional options that you may run, the most notable of which is the `explain` argument, which will instruct oreo to output its reason for each action it takes in a handsome green font.
+
+## Documentation
+
+One important alert for all interested users:
+
+:warning: **<span style="color:red">OREO WILL NOT DIET FOR YOU; IT WILL JUST USE ADVENTURES. FILL YOUR ORGANS!</span>** :warning:
+
+To report bugs, please post issues on this GitHub repository.
+
+## FAQS
+
+* The script is pronounced ore-o, because it helps you mine ore. I don't understand why so many people get this wrong.
