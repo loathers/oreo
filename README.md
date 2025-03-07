@@ -1,6 +1,6 @@
 # oreo
 
-70s volcano mining script! 󰢷
+That 70s Volcano mining script! ⛏️
 
 # Development
 
