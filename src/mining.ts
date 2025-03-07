@@ -30,6 +30,10 @@ export enum Mine {
   VOLCANO = 6,
 }
 
+/**
+ * Coordinate system that the Kingdom of Loathing uses for mining.
+ * The first row, first column and last column are all unbreakable.
+ */
 type Coord = [column: number, row: number];
 
 /**
@@ -69,13 +73,30 @@ const stateIndexToCoord = (position: number) => {
 };
 
 const getAccessibleSparklesForIndex = (state: string, index: number) => {
+  // Translate index to 0-indexed coord
+  const coords = stateIndexToCoord(index);
+  const [col, row] = [coords[0] - 1, coords[1] - 1];
+
   // Front row sparkles are always accessible
-  if (index >= 30 && state[index] === "*") return [stateIndexToCoord(index)];
+  if (row >= 5 && state[index] === "*") return [coords];
   // Otherwise we are looking for open spots only
   if (state[index] !== "o") return [];
+
   // Look at the cardinal mask for sparkles
-  return [index - 1, index + 1, index - 6, index + 6]
-    .filter((p) => p >= 0 && p < state.length && state[p] === "*")
+  return [
+    [-1, 0],
+    [1, 0],
+    [0, -1],
+    [0, 1],
+  ]
+    .map(([dy, dx]) => {
+      const y = col + dy;
+      const x = row + dx;
+      if (x < 0 || x > 5 || y < 0 || y > 5) return null;
+      return x * 6 + y;
+    })
+    .filter((i) => i !== null)
+    .filter((i) => state[i] === "*")
     .map(stateIndexToCoord);
 };
 

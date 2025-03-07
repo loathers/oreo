@@ -1,4 +1,4 @@
-import { Args, getTasks, Quest, Task } from "grimoire-kolmafia";
+import { Args, getTasks, Quest } from "grimoire-kolmafia";
 import {
   canAdventure,
   inebrietyLimit,
@@ -9,7 +9,7 @@ import {
 import { $location, sinceKolmafiaRevision } from "libram";
 
 import { args } from "./args";
-import { MiningEngine } from "./engine";
+import { MiningEngine, Task } from "./engine";
 import { countFreeMines, Mine, visit } from "./mining";
 import { MINING_TASKS } from "./tasks";
 
@@ -29,7 +29,7 @@ export default function main(argstring = "") {
   visit(Mine.VOLCANO);
 
   const quest: Quest<Task> = {
-    name: "Going ham at the Velvet / Gold Mine!",
+    name: "Oreo",
     ready: () =>
       // Indicative of access to the 70s Volcano
       canAdventure($location`The SMOOCH Army HQ`) &&

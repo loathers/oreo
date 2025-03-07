@@ -1,4 +1,3 @@
-import { Task } from "grimoire-kolmafia";
 import {
   abort,
   myHp,
@@ -11,6 +10,7 @@ import {
 import { $item, $modifier, get, have, tuple } from "libram";
 
 import { args } from "./args";
+import { Task } from "./engine";
 import * as Mining from "./mining";
 import { Mine } from "./mining";
 import { printExplanation } from "./utils";
@@ -18,6 +18,7 @@ import { printExplanation } from "./utils";
 export const MINING_TASKS: Task[] = [
   {
     name: "Acquire mining drill",
+    noCombat: true,
     completed: () => have($item`high-temperature mining drill`),
     limit: { tries: 1 },
     acquire: [
@@ -30,7 +31,8 @@ export const MINING_TASKS: Task[] = [
   },
   {
     after: ["Acquire mining drill"],
-    name: "Mine!",
+    noCombat: true,
+    name: "Mine",
     completed: () => false,
     outfit: {
       equip: [$item`high-temperature mining drill`],
