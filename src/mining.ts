@@ -34,7 +34,7 @@ export enum Mine {
  * Coordinate system that the Kingdom of Loathing uses for mining.
  * The first row, first column and last column are all unbreakable.
  */
-type Coord = [column: number, row: number];
+export type MiningCoordinate = [column: number, row: number];
 
 /**
  * @param mine Which mine
@@ -69,7 +69,7 @@ export function caveInCost(mine: Mine) {
 const stateIndexToCoord = (position: number) => {
   const row = Math.floor(position / 6);
   const col = position % 6;
-  return tuple<Coord>(col + 1, row + 1);
+  return tuple<MiningCoordinate>(col + 1, row + 1);
 };
 
 const getAccessibleSparklesForIndex = (state: string, index: number) => {
@@ -142,7 +142,7 @@ export function findNewCavern(mine: Mine) {
  * @param coords Coordinates at which to mine (using the in-game coordinate system)
  * @returns Items acquired from mining that coordinate, if any.
  */
-export function mineCoordinate(mine: Mine, [col, row]: Coord) {
+export function mineCoordinate(mine: Mine, [col, row]: MiningCoordinate) {
   const page = visitUrl(`mining.php?mine=${mine}&which=${col + 8 * row}&pwd`, true);
   return extractItems(page);
 }
