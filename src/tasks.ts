@@ -66,10 +66,8 @@ export const MINING_TASKS: Task[] = [
       if (myHp() === 0) abort("You must have at least 1HP to mine.");
     },
     do: () => {
-      // Pick a sparkly coordinate. We will mine all of these until we strike gold, so we might as well pick the first one.
-      const coord = getAccessibleSparkles().filter(([, y]) => [5, 6].includes(y))[0];
-
-      mineCoordinate(coord);
+      // Mine a sparkly coordinate. We will mine all of these until we strike gold, so we might as well pick the first one.
+      mineCoordinate(getAccessibleSparkles()[0]);
     },
     completed: () => false,
   },
