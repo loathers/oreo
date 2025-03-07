@@ -77,10 +77,15 @@ export const MINING_TASKS: Task[] = [
     name: "Mine a regular spot",
     after: ["Acquire mining drill"],
     noCombat: true,
-    outfit: {
-      equip: [$item`high-temperature mining drill`],
+    outfit: () => ({
+      equip: [
+        $item`high-temperature mining drill`,
+        ...(have($item`Xiblaxian holo-wrist-puter`) && !get("_holoWristCrystal")
+          ? [$item`Xiblaxian holo-wrist-puter`]
+          : []),
+      ],
       modifier: args.survive || myHp() >= 75 ? "Hot Resistance" : "15Hot Resistance, hp regen",
-    },
+    }),
     acquire: [
       // Grab a minin' dynamite if it would save us compared to the value of an adventure here
       { item: $item`minin' dynamite`, price: get("valueOfAdventure") - 1, optional: true },
