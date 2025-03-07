@@ -80,6 +80,7 @@ export const MINING_TASKS: Task[] = [
     outfit: () => ({
       equip: [
         $item`high-temperature mining drill`,
+        // @todo This is not worth it if it causes a player to fail the Hot Res requirement
         ...(have($item`Xiblaxian holo-wrist-puter`) && !get("_holoWristCrystal")
           ? [$item`Xiblaxian holo-wrist-puter`]
           : []),
