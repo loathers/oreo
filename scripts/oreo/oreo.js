@@ -6055,7 +6055,19 @@ _defineProperty10(MiningEngine, "defaultSettings", _objectSpread7(_objectSpread7
 // src/tasks.ts
 init_kolmafia_polyfill();
 var import_kolmafia15 = require("kolmafia");
-var _templateObject67, _templateObject217, _templateObject316, _templateObject414, _templateObject511, _templateObject68, _templateObject75;
+var _templateObject67, _templateObject217, _templateObject316, _templateObject414, _templateObject511, _templateObject68, _templateObject75, _templateObject85, _templateObject94;
+function _toConsumableArray11(r) {
+  return _arrayWithoutHoles11(r) || _iterableToArray11(r) || _unsupportedIterableToArray15(r) || _nonIterableSpread11();
+}
+function _nonIterableSpread11() {
+  throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
+}
+function _iterableToArray11(r) {
+  if (typeof Symbol < "u" && r[Symbol.iterator] != null || r["@@iterator"] != null) return Array.from(r);
+}
+function _arrayWithoutHoles11(r) {
+  if (Array.isArray(r)) return _arrayLikeToArray15(r);
+}
 function _slicedToArray10(r, e) {
   return _arrayWithHoles10(r) || _iterableToArrayLimit10(r, e) || _unsupportedIterableToArray15(r, e) || _nonIterableRest10();
 }
@@ -6184,14 +6196,16 @@ var MINING_TASKS = [{
   name: "Mine a regular spot",
   after: ["Acquire mining drill"],
   noCombat: !0,
-  outfit: {
-    equip: [$item(_templateObject68 || (_templateObject68 = _taggedTemplateLiteral8(["high-temperature mining drill"])))],
-    modifier: args.survive || (0, import_kolmafia15.myHp)() >= 75 ? "Hot Resistance" : "15Hot Resistance, hp regen"
+  outfit: function() {
+    return {
+      equip: [$item(_templateObject68 || (_templateObject68 = _taggedTemplateLiteral8(["high-temperature mining drill"])))].concat(_toConsumableArray11(have($item(_templateObject75 || (_templateObject75 = _taggedTemplateLiteral8(["Xiblaxian holo-wrist-puter"])))) && !get("_holoWristCrystal") ? [$item(_templateObject85 || (_templateObject85 = _taggedTemplateLiteral8(["Xiblaxian holo-wrist-puter"])))] : [])),
+      modifier: args.survive || (0, import_kolmafia15.myHp)() >= 75 ? "Hot Resistance" : "15Hot Resistance, hp regen"
+    };
   },
   acquire: [
     // Grab a minin' dynamite if it would save us compared to the value of an adventure here
     {
-      item: $item(_templateObject75 || (_templateObject75 = _taggedTemplateLiteral8(["minin' dynamite"]))),
+      item: $item(_templateObject94 || (_templateObject94 = _taggedTemplateLiteral8(["minin' dynamite"]))),
       price: get("valueOfAdventure") - 1,
       optional: !0
     }
@@ -6219,10 +6233,10 @@ var MINING_TASKS = [{
 
 // src/main.ts
 var _templateObject69;
-function _toConsumableArray11(r) {
-  return _arrayWithoutHoles11(r) || _iterableToArray11(r) || _unsupportedIterableToArray16(r) || _nonIterableSpread11();
+function _toConsumableArray12(r) {
+  return _arrayWithoutHoles12(r) || _iterableToArray12(r) || _unsupportedIterableToArray16(r) || _nonIterableSpread12();
 }
-function _nonIterableSpread11() {
+function _nonIterableSpread12() {
   throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
 }
 function _unsupportedIterableToArray16(r, a) {
@@ -6232,10 +6246,10 @@ function _unsupportedIterableToArray16(r, a) {
     return t === "Object" && r.constructor && (t = r.constructor.name), t === "Map" || t === "Set" ? Array.from(r) : t === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(t) ? _arrayLikeToArray16(r, a) : void 0;
   }
 }
-function _iterableToArray11(r) {
+function _iterableToArray12(r) {
   if (typeof Symbol < "u" && r[Symbol.iterator] != null || r["@@iterator"] != null) return Array.from(r);
 }
-function _arrayWithoutHoles11(r) {
+function _arrayWithoutHoles12(r) {
   if (Array.isArray(r)) return _arrayLikeToArray16(r);
 }
 function _arrayLikeToArray16(r, a) {
@@ -6265,7 +6279,7 @@ function main() {
     completed: function() {
       return (0, import_kolmafia16.totalTurnsPlayed)() >= stopAtTurn && countFreeMines() === 0;
     },
-    tasks: _toConsumableArray11(MINING_TASKS)
+    tasks: _toConsumableArray12(MINING_TASKS)
   }, engine = new MiningEngine(getTasks([quest]));
   try {
     engine.run();
