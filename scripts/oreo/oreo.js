@@ -6062,18 +6062,6 @@ function _toConsumableArray11(r) {
 function _nonIterableSpread11() {
   throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
 }
-function _iterableToArray11(r) {
-  if (typeof Symbol < "u" && r[Symbol.iterator] != null || r["@@iterator"] != null) return Array.from(r);
-}
-function _arrayWithoutHoles11(r) {
-  if (Array.isArray(r)) return _arrayLikeToArray15(r);
-}
-function _slicedToArray10(r, e) {
-  return _arrayWithHoles10(r) || _iterableToArrayLimit10(r, e) || _unsupportedIterableToArray15(r, e) || _nonIterableRest10();
-}
-function _nonIterableRest10() {
-  throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.");
-}
 function _unsupportedIterableToArray15(r, a) {
   if (r) {
     if (typeof r == "string") return _arrayLikeToArray15(r, a);
@@ -6081,34 +6069,16 @@ function _unsupportedIterableToArray15(r, a) {
     return t === "Object" && r.constructor && (t = r.constructor.name), t === "Map" || t === "Set" ? Array.from(r) : t === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(t) ? _arrayLikeToArray15(r, a) : void 0;
   }
 }
+function _iterableToArray11(r) {
+  if (typeof Symbol < "u" && r[Symbol.iterator] != null || r["@@iterator"] != null) return Array.from(r);
+}
+function _arrayWithoutHoles11(r) {
+  if (Array.isArray(r)) return _arrayLikeToArray15(r);
+}
 function _arrayLikeToArray15(r, a) {
   (a == null || a > r.length) && (a = r.length);
   for (var e = 0, n = Array(a); e < a; e++) n[e] = r[e];
   return n;
-}
-function _iterableToArrayLimit10(r, l) {
-  var t = r == null ? null : typeof Symbol < "u" && r[Symbol.iterator] || r["@@iterator"];
-  if (t != null) {
-    var e, n, i, u, a = [], f = !0, o = !1;
-    try {
-      if (i = (t = t.call(r)).next, l === 0) {
-        if (Object(t) !== t) return;
-        f = !1;
-      } else for (; !(f = (e = i.call(t)).done) && (a.push(e.value), a.length !== l); f = !0) ;
-    } catch (r2) {
-      o = !0, n = r2;
-    } finally {
-      try {
-        if (!f && t.return != null && (u = t.return(), Object(u) !== u)) return;
-      } finally {
-        if (o) throw n;
-      }
-    }
-    return a;
-  }
-}
-function _arrayWithHoles10(r) {
-  if (Array.isArray(r)) return r;
 }
 function _taggedTemplateLiteral8(e, t) {
   return t || (t = e.slice(0)), Object.freeze(Object.defineProperties(e, { raw: { value: Object.freeze(t) } }));
@@ -6183,11 +6153,7 @@ var MINING_TASKS = [{
     (0, import_kolmafia15.myHp)() === 0 && (0, import_kolmafia15.abort)("You must have at least 1HP to mine.");
   },
   do: function() {
-    var coord = getAccessibleSparkles2().filter(function(_ref) {
-      var _ref2 = _slicedToArray10(_ref, 2), y = _ref2[1];
-      return [5, 6].includes(y);
-    })[0];
-    mineCoordinate2(coord);
+    mineCoordinate2(getAccessibleSparkles2()[0]);
   },
   completed: function() {
     return !1;
