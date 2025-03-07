@@ -8,11 +8,12 @@ import {
   retrievePrice,
   use,
 } from "kolmafia";
-import { $item, $modifier, extractItems, get, have, tuple } from "libram";
+import { $item, $modifier, get, have, tuple } from "libram";
 
 import { args } from "./args";
-import { caveInCost, findNewCavern, getCavernInfo, Mine, mineAtSpot } from "./mining";
-import { State } from "./utils";
+import * as Mining from "./mining";
+import { Mine } from "./mining";
+import { printExplanation } from "./utils";
 
 export const MINING_TASKS: Task[] = [
   {
@@ -42,7 +43,7 @@ export const MINING_TASKS: Task[] = [
         );
       }
 
-      const minHp = caveInCost(6);
+      const minHp = Mining.caveInCost(6);
       if (args.survive && myHp() < minHp) {
         const hpRestore = 2 * minHp + myHp();
         if (!restoreHp(hpRestore)) abort("Could not restore enough HP to survive the cave-in.");
@@ -51,17 +52,25 @@ export const MINING_TASKS: Task[] = [
       if (myHp() === 0) abort("You must have at least 1HP to mine.");
     },
     do: () => {
-      const { mined, sparkles } = getCavernInfo(State.page);
+      const mined = Mining.minedSpots(Mine.VOLCANO);
+      const sparkles = Mining.getAccessibleSparkles(Mine.VOLCANO);
 
-      // If we have a sparkly target, mine the deepest one visible
-      // @TODO support object detection and pick the good spot. This will need the ability to determine which sparkly spots are accessible.
+      // If we have mined two spots, we want to move on immediately
+      if (mined >= 2) {
+        if (args.explain) printExplanation("Two o, moving on");
+        Mining.findNewCavern(Mine.VOLCANO);
+        return;
+      }
+
+      // If we have a sparkly target in the first two rows, pick the deepest one accessible
       let coords = sparkles
         .filter(([, y]) => [5, 6].includes(y))
-        .sort(([, y1], [, y2]) => y2 - y1)[0];
+        .sort(([, y1], [, y2]) => y1 - y2)[0];
 
       // If we have mined at least once and have no sparkly targets, move on.
-      if (!coords && mined) {
-        State.page = findNewCavern(Mine.VOLCANO);
+      if (!coords && mined >= 1) {
+        printExplanation("One o but no *, moving on");
+        Mining.findNewCavern(Mine.VOLCANO);
         return;
       }
 
@@ -70,14 +79,32 @@ export const MINING_TASKS: Task[] = [
         // Grab a minin' dynamite if it would save us compared to the value of an adventure here
         if (retrievePrice($item`minin' dynamite`) < get("valueOfAdventure"))
           retrieveItem($item`minin' dynamite`);
-        coords = tuple(2 + Math.floor(Math.random() * 4), 6);
+
+        // Find a shiny spot in the second row we can aim for
+        const column = Mining.getState(Mine.VOLCANO).slice(-12, -6).indexOf("*");
+
+        if (column >= 0) {
+          printExplanation(`No * in row 6, saw * at (${column + 1},5), so aiming for that`);
+        } else {
+          printExplanation(`No * in row 6, picking random spot between (2,6) and (5,6)`);
+        }
+
+        // Either use that column or pick a random spot in the middle of the front row
+        coords = tuple(column >= 0 ? column + 1 : 2 + Math.floor(Math.random() * 4), 6);
       }
 
-      State.page = mineAtSpot(Mine.VOLCANO, ...coords);
+      printExplanation(
+        `\n${Mining.getAsMatrix(Mine.VOLCANO)
+          .map((row) => row.join(""))
+          .join("\n")}\nPicked (${coords.join(",")})`,
+      );
+
+      const results = Mining.mineCoordinate(Mine.VOLCANO, coords);
 
       // If we found a prize, move on to the next cavern
-      if (extractItems(State.page).has($item`1,970 carat gold`)) {
-        State.page = findNewCavern(Mine.VOLCANO);
+      if (results.has($item`1,970 carat gold`)) {
+        printExplanation("Found prize, moving on");
+        Mining.findNewCavern(Mine.VOLCANO);
       }
     },
   },

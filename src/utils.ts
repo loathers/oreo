@@ -1,8 +1,6 @@
-import { isDarkMode, print } from "kolmafia";
+import { isDarkMode, print, printHtml } from "kolmafia";
 
-export const State = {
-  page: "",
-};
+import { args } from "./args";
 
 export function printHighlight(message: string): void {
   const color = isDarkMode() ? "yellow" : "blue";
@@ -10,6 +8,10 @@ export function printHighlight(message: string): void {
 }
 
 export function printError(message: string): void {
-  const color = "red";
-  print(message, color);
+  print(message, "red");
+}
+
+export function printExplanation(message: string): void {
+  if (!args.explain) return;
+  printHtml(`<pre color="green">[EXPLAIN] ${message}</pre>`);
 }

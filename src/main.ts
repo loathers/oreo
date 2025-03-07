@@ -1,21 +1,21 @@
 import { Args, getTasks, Quest, Task } from "grimoire-kolmafia";
 import {
-  abort,
   canAdventure,
   inebrietyLimit,
   myAdventures,
   myInebriety,
   totalTurnsPlayed,
 } from "kolmafia";
-import { $location } from "libram";
+import { $location, sinceKolmafiaRevision } from "libram";
 
 import { args } from "./args";
 import { MiningEngine } from "./engine";
-import { countFreeMines, hasObjectDetection, Mine, visit } from "./mining";
+import { countFreeMines, Mine, visit } from "./mining";
 import { MINING_TASKS } from "./tasks";
-import { State } from "./utils";
 
 export default function main(argstring = "") {
+  sinceKolmafiaRevision(28420);
+
   Args.fill(args, argstring);
 
   if (args.help) {
@@ -23,13 +23,10 @@ export default function main(argstring = "") {
     return;
   }
 
-  if (hasObjectDetection()) {
-    abort("Object detection is not currently supported by this script.");
-  }
-
   const stopAtTurn = totalTurnsPlayed() + args.turns;
 
-  State.page = visit(Mine.VOLCANO);
+  // Make sure the mine state is up to date
+  visit(Mine.VOLCANO);
 
   const quest: Quest<Task> = {
     name: "Going ham at the Velvet / Gold Mine!",

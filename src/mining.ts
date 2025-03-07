@@ -1,21 +1,51 @@
 import { haveEffect, isWearingOutfit, myBuffedstat, visitUrl } from "kolmafia";
-import { $effect, $element, $skill, $stat, damageTakenByElement, get, have, tuple } from "libram";
+import {
+  $effect,
+  $element,
+  $skill,
+  $stat,
+  chunk,
+  damageTakenByElement,
+  extractItems,
+  get,
+  have,
+  tuple,
+} from "libram";
 
+/**
+ * Mines in the Kingdom of Loathing
+ */
 export enum Mine {
+  /** Inside of Itznotyerzitz Mine */
   ITZNOTYERZITZ = 1,
+  /** Deep Inside the Knob Shaft */
   KNOB = 2,
+  /** Anemone Mine */
   ANEMONE = 3,
+  /** The Gummi Mine (Retired, Crimbo 2011) */
   GUMMI = 4,
+  /** Crimbonium Mine (Retired, Crimbo 2014) */
   CRIMBONIUM = 5,
+  /** The Velvet / Gold Mine */
   VOLCANO = 6,
 }
 
+type Coord = [column: number, row: number];
+
+/**
+ * @param mine Which mine
+ * @returns Whether twinkly squares will be visible even when when not accessible
+ */
 export function hasObjectDetection(mine = 1): boolean {
   if (mine === Mine.CRIMBONIUM && have($effect`Crimbonar`)) return true;
   return haveEffect($effect`Object Detection`) !== 0 || isWearingOutfit("Dwarvish War Uniform");
 }
 
-export function caveInCost(mine: number) {
+/**
+ * @param mine Which mine
+ * @returns The maximum damage the current player can expect to take from a cave-in
+ */
+export function caveInCost(mine: Mine) {
   switch (mine) {
     case Mine.ITZNOTYERZITZ:
     case Mine.GUMMI:
@@ -32,31 +62,95 @@ export function caveInCost(mine: number) {
   }
 }
 
-export function findSparklyCoordinates(page: string) {
-  return [...page.matchAll(/Promising Chunk of Wall \((\d),(\d)\)/g)].map(([, x, y]) =>
-    tuple(Number(x), Number(y)),
+const stateIndexToCoord = (position: number) => {
+  const row = Math.floor(position / 6);
+  const col = position % 6;
+  return tuple<Coord>(col + 1, row + 1);
+};
+
+const getAccessibleSparklesForIndex = (state: string, index: number) => {
+  // Front row sparkles are always accessible
+  if (index >= 30 && state[index] === "*") return [stateIndexToCoord(index)];
+  // Otherwise we are looking for open spots only
+  if (state[index] !== "o") return [];
+  // Look at the cardinal mask for sparkles
+  return [index - 1, index + 1, index - 6, index + 6]
+    .filter((p) => p >= 0 && p < state.length && state[p] === "*")
+    .map(stateIndexToCoord);
+};
+
+/**
+ * List all sparkly rocks adjacent to an open space. This will be simply a list of all sparkly rocks
+ * without some form of Object Detection.
+ *
+ * This assumes all open spots are accessible. If spots at the back of the mine were somehow to be open
+ * this would be no longer be correct.
+ *
+ * @param mine Which mine
+ * @returns List of all sparkly rocks adjacent to an open space
+ */
+export function getAccessibleSparkles(mine: Mine) {
+  const state = get(`mineState${mine}`, "");
+  return [...Array(state.length).fill(0)].flatMap((v, position) =>
+    getAccessibleSparklesForIndex(state, position),
   );
 }
 
-export function getCavernInfo(page: string) {
-  return {
-    mined: /Open Cavern \(\d,6\)/.test(page),
-    sparkles: findSparklyCoordinates(page),
-  };
+/**
+ * @param mine Which mine
+ * @returns Returns number of mined spots in the current cavern
+ */
+export function minedSpots(mine: Mine) {
+  return get(`mineState${mine}`, "")
+    .split("")
+    .filter((c) => c === "o").length;
 }
 
-export function findNewCavern(mine: number) {
+/**
+ * Visit a new cavern if possible
+ *
+ * @param mine Which mine
+ * @returns Page contents
+ */
+export function findNewCavern(mine: Mine) {
   return visitUrl(`mining.php?mine=${mine}&reset=1&pwd`, true);
 }
 
-export function mineAtSpot(mine: number, col: number, row: number) {
-  return visitUrl(`mining.php?mine=${mine}&which=${col + 8 * row}&pwd`, true);
+/**
+ * @param mine Which mine
+ * @param coords Coordinates at which to mine (using the in-game coordinate system)
+ * @returns Items acquired from mining that coordinate, if any.
+ */
+export function mineCoordinate(mine: Mine, [col, row]: Coord) {
+  const page = visitUrl(`mining.php?mine=${mine}&which=${col + 8 * row}&pwd`, true);
+  return extractItems(page);
 }
 
-export function visit(mine: number) {
+/**
+ * Visit a mine
+ *
+ * @param mine Which mine
+ * @returns Page contents
+ */
+export function visit(mine: Mine) {
   return visitUrl(`mining.php?mine=${mine}`);
 }
 
+/**
+ * @param mine Which mine
+ * @returns The state for the given mine
+ */
+export function getState(mine: Mine) {
+  return get(`mineState${mine}`, "");
+}
+
+export function getAsMatrix(mine: Mine) {
+  return chunk(getState(mine).split(""), 6);
+}
+
+/**
+ * @returns Number of unconditionally free mines (minin' dynamite is not counted as it only works with non-sparkly spots)
+ */
 export function countFreeMines() {
   return (
     (have($skill`Unaccompanied Miner`) ? 5 - get("_unaccompaniedMinerUsed") : 0) +

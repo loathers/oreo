@@ -8,7 +8,7 @@ export class MiningEngine extends Engine<never, Task> {
 
   static defaultSettings = {
     ...Engine.defaultSettings,
-    logPreferenceChangeFilter: `${Engine.defaultSettings.logPreferenceChangeFilter},mineLayout6`,
+    logPreferenceChangeFilter: `${Engine.defaultSettings.logPreferenceChangeFilter},mineLayout6,mineState6,lastAdventure`,
   };
 
   constructor(tasks: Task[]) {

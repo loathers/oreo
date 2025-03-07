@@ -12,6 +12,10 @@ export const args = Args.create(
       help: "Whether to avoid hitting zero HP while mining",
       default: false,
     }),
+    explain: Args.boolean({
+      help: "Whether to print explanations for decisions",
+      default: false,
+    }),
   },
   {
     positionalArgs: ["turns"],
