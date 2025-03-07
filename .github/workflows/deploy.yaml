@@ -9,7 +9,6 @@ on:
 
 env:
   node-version: "22"
-  path: "dist " # The directory where your assets are generated, should match build.mjs
 
 jobs:
   test:
@@ -73,7 +72,7 @@ jobs:
         env:
           REPO: self
           BRANCH: release
-          FOLDER: ${{ env.path }}
+          FOLDER: dist
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           MESSAGE: "Build: ({sha}) {msg}"
           SKIP_EMPTY_COMMITS: true
