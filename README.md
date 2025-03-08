@@ -35,3 +35,4 @@ To report bugs, please post issues on this GitHub repository.
 ## FAQS
 
 * The script is pronounced ore-o, because it helps you mine ore. I don't understand why so many people get this wrong.
+* Object Detection is supported and some initial conservative investigation indicates it may be worth 200 extra mpa. You need to acquire the effect yourself.
