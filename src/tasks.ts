@@ -103,7 +103,7 @@ export const MINING_TASKS: Task[] = [
     }),
     acquire: [
       // Grab a minin' dynamite if it would save us compared to the value of an adventure here
-      { item: $item`minin' dynamite`, price: get("valueOfAdventure") - 1, optional: true },
+      { item: $item`minin' dynamite`, price: 3400, optional: true },
     ],
     ready: () => Mining.minedSpots(Mine.VOLCANO) === 0 && getAccessibleSparkles().length === 0,
     prepare: () => {
