@@ -6194,7 +6194,7 @@ var MINING_TASKS = [{
     // Grab a minin' dynamite if it would save us compared to the value of an adventure here
     {
       item: $item(_templateObject175 || (_templateObject175 = _taggedTemplateLiteral8(["minin' dynamite"]))),
-      price: get("valueOfAdventure") - 1,
+      price: 3400,
       optional: !0
     }
   ],
