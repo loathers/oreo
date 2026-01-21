@@ -13,7 +13,7 @@ import { MiningEngine, Task } from "./engine";
 import { countFreeMines, Mine, visit } from "./mining";
 import { MINING_TASKS } from "./tasks";
 
-export default function main(argstring = "") {
+export function main(argstring = "") {
   sinceKolmafiaRevision(28420);
 
   Args.fill(args, argstring);
