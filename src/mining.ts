@@ -192,7 +192,11 @@ const CARDINAL_MASK = [
  * @param visited Visited coordinates to avoid infinite recursion
  * @returns Size of the cluster of sparkly rocks at the given coordinate
  */
-export function getSparklyClusterSize([x, y]: MiningCoordinate, state: string[][], visited = new Set<string>()): number {
+export function getSparklyClusterSize(
+  [x, y]: MiningCoordinate,
+  state: string[][],
+  visited = new Set<string>(),
+): number {
   const key = `${x},${y}`;
   if (
     x < 0 ||
@@ -207,8 +211,9 @@ export function getSparklyClusterSize([x, y]: MiningCoordinate, state: string[][
   visited.add(key);
   return (
     1 +
-    CARDINAL_MASK
-      .map(([dx, dy]) => getSparklyClusterSize([x + dx, y + dy], state, visited))
-      .reduce((sum, val) => sum + val, 0)
+    CARDINAL_MASK.map(([dx, dy]) => getSparklyClusterSize([x + dx, y + dy], state, visited)).reduce(
+      (sum, val) => sum + val,
+      0,
+    )
   );
 }

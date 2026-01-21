@@ -42,7 +42,9 @@ export function getAccessibleSparkles() {
   const bottomRows = accessible.filter(([, y]) => y >= 5);
   if (!Mining.hasObjectDetection(Mine.VOLCANO)) return bottomRows;
   const state = Mining.getAsMatrix(Mine.VOLCANO);
-  const rest = accessible.filter(([, y]) => y < 5).filter(([x, y]) => Mining.getSparklyClusterSize([x, y], state) < 6);
+  const rest = accessible
+    .filter(([, y]) => y < 5)
+    .filter(([x, y]) => Mining.getSparklyClusterSize([x, y], state) < 6);
   return [...bottomRows, ...rest];
 }
 
