@@ -1,7 +1,7 @@
 import { Task as BaseTask, CombatResources, CombatStrategy, Engine } from "grimoire-kolmafia";
 import { Session } from "libram";
 
-import { printHighlight } from "./utils";
+import { printHighlight } from "./utils.js";
 
 export interface Task extends BaseTask {
   /** No combats can take place here */

@@ -8,10 +8,10 @@ import {
 } from "kolmafia";
 import { $location, sinceKolmafiaRevision } from "libram";
 
-import { args } from "./args";
-import { MiningEngine, Task } from "./engine";
-import { countFreeMines, Mine, visit } from "./mining";
-import { MINING_TASKS } from "./tasks";
+import { args } from "./args.js";
+import { MiningEngine, Task } from "./engine.js";
+import { countFreeMines, Mine, visit } from "./mining.js";
+import { MINING_TASKS } from "./tasks.js";
 
 export function main(argstring = "") {
   sinceKolmafiaRevision(28420);

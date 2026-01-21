@@ -1,9 +1,9 @@
 import { abort, isDarkMode, numericModifier, print, printHtml } from "kolmafia";
 import { $modifier } from "libram";
 
-import { args } from "./args";
-import * as Mining from "./mining";
-import { Mine, type MiningCoordinate } from "./mining";
+import { args } from "./args.js";
+import * as Mining from "./mining.js";
+import { Mine, type MiningCoordinate } from "./mining.js";
 
 export function printHighlight(message: string): void {
   const color = isDarkMode() ? "yellow" : "blue";

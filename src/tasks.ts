@@ -1,10 +1,10 @@
 import { abort, myHp, restoreHp, use } from "kolmafia";
 import { $item, get, have, tuple } from "libram";
 
-import { args } from "./args";
-import { Task } from "./engine";
-import * as Mining from "./mining";
-import { Mine } from "./mining";
+import { args } from "./args.js";
+import { Task } from "./engine.js";
+import * as Mining from "./mining.js";
+import { Mine } from "./mining.js";
 import {
   assureHotResistance,
   explain,
