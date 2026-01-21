@@ -178,3 +178,37 @@ export function countFreeMines() {
     haveEffect($effect`Loded`)
   );
 }
+
+const CARDINAL_MASK = [
+  [1, 0],
+  [-1, 0],
+  [0, 1],
+  [0, -1],
+];
+
+/**
+ * @param coords Coordinates at which to mine (using the in-game coordinate system)
+ * @param state The state of the mine to check
+ * @param visited Visited coordinates to avoid infinite recursion
+ * @returns Size of the cluster of sparkly rocks at the given coordinate
+ */
+export function getSparklyClusterSize([x, y]: MiningCoordinate, state: string[][], visited = new Set<string>()): number {
+  const key = `${x},${y}`;
+  if (
+    x < 0 ||
+    y < 0 ||
+    y >= state.length ||
+    x >= state[0].length ||
+    state[y][x] !== "*" ||
+    visited.has(key)
+  ) {
+    return 0;
+  }
+  visited.add(key);
+  return (
+    1 +
+    CARDINAL_MASK
+      .map(([dx, dy]) => getSparklyClusterSize([x + dx, y + dy], state, visited))
+      .reduce((sum, val) => sum + val, 0)
+  );
+}

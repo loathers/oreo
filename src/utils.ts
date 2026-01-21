@@ -38,7 +38,12 @@ export function mineCoordinate(coords: MiningCoordinate) {
 }
 
 export function getAccessibleSparkles() {
-  return Mining.getAccessibleSparkles(Mine.VOLCANO).filter(([, y]) => [5, 6].includes(y));
+  const accessible = Mining.getAccessibleSparkles(Mine.VOLCANO);
+  const bottomRows = accessible.filter(([, y]) => y >= 5);
+  if (!Mining.hasObjectDetection(Mine.VOLCANO)) return bottomRows;
+  const state = Mining.getAsMatrix(Mine.VOLCANO);
+  const rest = accessible.filter(([, y]) => y < 5).filter(([x, y]) => Mining.getSparklyClusterSize([x, y], state) < 6);
+  return [...bottomRows, ...rest];
 }
 
 export function findStartOfLongestVein(layout: string) {
