@@ -15,7 +15,7 @@ import {
 /**
  * Mines in the Kingdom of Loathing
  */
-export enum Mine {
+export const enum Mine {
   /** Inside of Itznotyerzitz Mine */
   ITZNOTYERZITZ = 1,
   /** Deep Inside the Knob Shaft */
