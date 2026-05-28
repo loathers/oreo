@@ -1,4 +1,4 @@
-import { abort, isDarkMode, numericModifier, print, printHtml } from "kolmafia";
+import { abort, isDarkMode, myHp, numericModifier, print, printHtml, restoreHp } from "kolmafia";
 import { $modifier } from "libram";
 
 import { args } from "./args.js";
@@ -25,6 +25,18 @@ export function assureHotResistance() {
       `More hot resistance needed (you have ${numericModifier($modifier`Hot Resistance`)}, you need 15).`,
     );
   }
+}
+
+export function prepareToMine() {
+  assureHotResistance();
+
+  const minHp = Mining.caveInCost(Mine.VOLCANO);
+  if (args.survive && myHp() < minHp) {
+    const hpRestore = 2 * minHp + myHp();
+    if (!restoreHp(hpRestore)) abort("Could not restore enough HP to survive the cave-in.");
+  }
+
+  if (myHp() === 0) abort("You must have at least 1HP to mine.");
 }
 
 export function mineCoordinate(coords: MiningCoordinate) {

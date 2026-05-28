@@ -1,7 +1,6 @@
-import { abort, myHp, restoreHp, use } from "kolmafia";
+import { use } from "kolmafia";
 import { $item, get, have, tuple } from "libram";
 
-import { args } from "./args.js";
 import { Task } from "./engine.js";
 import * as Mining from "./mining.js";
 import { Mine } from "./mining.js";
@@ -11,6 +10,7 @@ import {
   findStartOfLongestVein,
   getAccessibleSparkles,
   mineCoordinate,
+  prepareToMine,
 } from "./utils.js";
 
 export const MINING_TASKS: Task[] = [
@@ -70,17 +70,7 @@ export const MINING_TASKS: Task[] = [
       modifier: "Hot Resistance",
     },
     ready: () => getAccessibleSparkles().length > 0,
-    prepare: () => {
-      assureHotResistance();
-
-      const minHp = Mining.caveInCost(Mine.VOLCANO);
-      if (args.survive && myHp() < minHp) {
-        const hpRestore = 2 * minHp + myHp();
-        if (!restoreHp(hpRestore)) abort("Could not restore enough HP to survive the cave-in.");
-      }
-
-      if (myHp() === 0) abort("You must have at least 1HP to mine.");
-    },
+    prepare: () => prepareToMine(),
     do: () => {
       // Mine a sparkly coordinate. We will mine all of these until we strike gold, so we might as well pick the first one.
       mineCoordinate(getAccessibleSparkles()[0]);
@@ -106,17 +96,7 @@ export const MINING_TASKS: Task[] = [
       { item: $item`minin' dynamite`, price: 3400, optional: true },
     ],
     ready: () => Mining.minedSpots(Mine.VOLCANO) === 0 && getAccessibleSparkles().length === 0,
-    prepare: () => {
-      assureHotResistance();
-
-      const minHp = Mining.caveInCost(Mine.VOLCANO);
-      if (args.survive && myHp() < minHp) {
-        const hpRestore = 2 * minHp + myHp();
-        if (!restoreHp(hpRestore)) abort("Could not restore enough HP to survive the cave-in.");
-      }
-
-      if (myHp() === 0) abort("You must have at least 1HP to mine.");
-    },
+    prepare: () => prepareToMine(),
     do: () => {
       // Find a shiny spot in the second row we can aim for
       const column = findStartOfLongestVein(Mining.getState(Mine.VOLCANO).slice(-12, -6));
