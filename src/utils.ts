@@ -55,7 +55,8 @@ export function getAccessibleSparkles() {
 
 export function findStartOfLongestVein(layout: string) {
   return (
-    [...Array(layout.length).fill(0)]
+    Array(layout.length)
+      .fill(0)
       .map((_, i) => i)
       .filter((i) => layout[i] === "*")
       .map((i) => ({ i, size: layout.slice(i).match(/^(\*+)/)?.[1].length ?? 0 }))
