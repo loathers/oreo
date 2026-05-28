@@ -34,7 +34,7 @@ export function main(argstring = "") {
       // Indicative of access to the 70s Volcano
       canAdventure($location`The SMOOCH Army HQ`) &&
       myInebriety() <= inebrietyLimit() &&
-      myAdventures() > 0,
+      (myAdventures() > 0 || countFreeMines() > 0),
     completed: () => totalTurnsPlayed() >= stopAtTurn && countFreeMines() === 0,
     tasks: [...MINING_TASKS],
   };
