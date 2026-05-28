@@ -11,7 +11,7 @@ import {
   findStartOfLongestVein,
   getAccessibleSparkles,
   mineCoordinate,
-} from "./utils";
+} from "./utils.js";
 
 export const MINING_TASKS: Task[] = [
   {
