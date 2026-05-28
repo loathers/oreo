@@ -89,11 +89,11 @@ const getAccessibleSparklesForIndex = (state: string, index: number) => {
     [0, -1],
     [0, 1],
   ]
-    .map(([dy, dx]) => {
-      const y = col + dy;
-      const x = row + dx;
-      if (x < 0 || x > 5 || y < 0 || y > 5) return null;
-      return x * 6 + y;
+    .map(([dCol, dRow]) => {
+      const neighborCol = col + dCol;
+      const neighborRow = row + dRow;
+      if (neighborCol < 0 || neighborCol > 5 || neighborRow < 0 || neighborRow > 5) return null;
+      return neighborRow * 6 + neighborCol;
     })
     .filter((i) => i !== null)
     .filter((i) => state[i] === "*")
