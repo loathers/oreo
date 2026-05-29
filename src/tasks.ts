@@ -9,6 +9,7 @@ import {
   explain,
   findStartOfLongestVein,
   getAccessibleSparkles,
+  MINING_MODIFIER,
   mineCoordinate,
   prepareToMine,
 } from "./utils.js";
@@ -28,20 +29,12 @@ export const MINING_TASKS: Task[] = [
     completed: () => have($item`high-temperature mining drill`),
   },
   {
-    name: "Acquire hippy medical kit",
-    noCombat: true,
-    limit: { tries: 1 },
-    acquire: [{ item: $item`hippy medical kit` }],
-    do: () => {},
-    completed: () => have($item`hippy medical kit`),
-  },
-  {
     name: "Move to a new cavern having struck gold in this cavern",
     after: ["Acquire mining drill"],
     noCombat: true,
     outfit: {
-      equip: [$item`high-temperature mining drill`, $item`hippy medical kit`],
-      modifier: "Hot Resistance",
+      equip: [$item`high-temperature mining drill`],
+      modifier: MINING_MODIFIER,
     },
     ready: () => get("mineLayout6").includes("goldnugget"),
     prepare: () => assureHotResistance(),
@@ -53,8 +46,8 @@ export const MINING_TASKS: Task[] = [
     after: ["Acquire mining drill"],
     noCombat: true,
     outfit: {
-      equip: [$item`high-temperature mining drill`, $item`hippy medical kit`],
-      modifier: "Hot Resistance",
+      equip: [$item`high-temperature mining drill`],
+      modifier: MINING_MODIFIER,
     },
     ready: () => Mining.minedSpots(Mine.VOLCANO) >= 1 && getAccessibleSparkles().length === 0,
     prepare: () => assureHotResistance(),
@@ -66,8 +59,8 @@ export const MINING_TASKS: Task[] = [
     after: ["Acquire mining drill"],
     noCombat: true,
     outfit: {
-      equip: [$item`high-temperature mining drill`, $item`hippy medical kit`],
-      modifier: "Hot Resistance",
+      equip: [$item`high-temperature mining drill`],
+      modifier: MINING_MODIFIER,
     },
     ready: () => getAccessibleSparkles().length > 0,
     prepare: () => prepareToMine(),
@@ -84,12 +77,11 @@ export const MINING_TASKS: Task[] = [
     outfit: () => ({
       equip: [
         $item`high-temperature mining drill`,
-        $item`hippy medical kit`,
         ...(have($item`Xiblaxian holo-wrist-puter`) && !get("_holoWristCrystal")
           ? [$item`Xiblaxian holo-wrist-puter`]
           : []),
       ],
-      modifier: "Hot Resistance",
+      modifier: MINING_MODIFIER,
     }),
     acquire: [
       // Grab a minin' dynamite if it would save us compared to the value of an adventure here
