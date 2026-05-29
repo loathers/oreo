@@ -1,4 +1,4 @@
-import { abort, isDarkMode, myHp, numericModifier, print, printHtml, restoreHp } from "kolmafia";
+import { abort, isDarkMode, myHp, numericModifier, print, printHtml } from "kolmafia";
 import { $modifier } from "libram";
 
 import { args } from "./args.js";
@@ -27,16 +27,22 @@ export function assureHotResistance() {
   }
 }
 
+export function assureHpRegen() {
+  if (myHp() > 0) return;
+  if (numericModifier($modifier`HP Regen Min`) < 1) {
+    abort(
+      "Couldn't equip any HP regen - pick up a hippy medical kit (or any other HP-regen source) and try again.",
+    );
+  }
+  abort("You must have at least 1HP to mine.");
+}
+
+// Require at least 1 HP Regen Min from any source (passive skill, effect, or equipment) and cap its scoring at 1 so the maximizer doesn't trade away Hot Resistance to chase more.
+export const MINING_MODIFIER = "Hot Resistance, HP Regen Min 1 min, HP Regen Min 1 max";
+
 export function prepareToMine() {
   assureHotResistance();
-
-  const minHp = Mining.caveInCost(Mine.VOLCANO);
-  if (args.survive && myHp() < minHp) {
-    const hpRestore = 2 * minHp + myHp();
-    if (!restoreHp(hpRestore)) abort("Could not restore enough HP to survive the cave-in.");
-  }
-
-  if (myHp() === 0) abort("You must have at least 1HP to mine.");
+  assureHpRegen();
 }
 
 export function mineCoordinate(coords: MiningCoordinate) {
