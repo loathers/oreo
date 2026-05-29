@@ -5948,12 +5948,12 @@ var getAccessibleSparklesForIndex = (state, index) => {
   // Look at the cardinal mask for sparkles
   return [[-1, 0], [1, 0], [0, -1], [0, 1]].map(_ref => {
     var _ref2 = _slicedToArray(_ref, 2),
-      dy = _ref2[0],
-      dx = _ref2[1];
-    var y = col + dy;
-    var x = row + dx;
-    if (x < 0 || x > 5 || y < 0 || y > 5) return null;
-    return x * 6 + y;
+      dCol = _ref2[0],
+      dRow = _ref2[1];
+    var neighborCol = col + dCol;
+    var neighborRow = row + dRow;
+    if (neighborCol < 0 || neighborCol > 5 || neighborRow < 0 || neighborRow > 5) return null;
+    return neighborRow * 6 + neighborCol;
   }).filter(i => i !== null).filter(i => state[i] === "*").map(stateIndexToCoord);
 };
 
@@ -5969,7 +5969,7 @@ var getAccessibleSparklesForIndex = (state, index) => {
  */
 function getAccessibleSparkles$1(mine) {
   var state = get("mineState".concat(mine), "");
-  return _toConsumableArray(Array(state.length).fill(0)).flatMap((v, position) => getAccessibleSparklesForIndex(state, position));
+  return Array(state.length).fill(0).flatMap((v, position) => getAccessibleSparklesForIndex(state, position));
 }
 
 /**
@@ -6045,6 +6045,15 @@ function assureHotResistance() {
     kolmafia.abort("More hot resistance needed (you have ".concat(kolmafia.numericModifier($modifier(_templateObject2$1 || (_templateObject2$1 = _taggedTemplateLiteral(["Hot Resistance"])))), ", you need 15)."));
   }
 }
+function prepareToMine() {
+  assureHotResistance();
+  var minHp = caveInCost(Mine.VOLCANO);
+  if (args.survive && kolmafia.myHp() < minHp) {
+    var hpRestore = 2 * minHp + kolmafia.myHp();
+    if (!kolmafia.restoreHp(hpRestore)) kolmafia.abort("Could not restore enough HP to survive the cave-in.");
+  }
+  if (kolmafia.myHp() === 0) kolmafia.abort("You must have at least 1HP to mine.");
+}
 function mineCoordinate(coords) {
   explain("\n".concat(getAsMatrix(Mine.VOLCANO).map(row => row.join("")).join("\n"), "\nPicked (").concat(coords.join(","), ")"));
   mineCoordinate$1(Mine.VOLCANO, coords);
@@ -6057,14 +6066,14 @@ function getAccessibleSparkles() {
   });
 }
 function findStartOfLongestVein(layout) {
-  var _map$filter$map$sort$;
-  return ((_map$filter$map$sort$ = _toConsumableArray(Array(layout.length).fill(0)).map((_, i) => i).filter(i => layout[i] === "*").map(i => {
+  var _Array$fill$map$filte;
+  return ((_Array$fill$map$filte = Array(layout.length).fill(0).map((_, i) => i).filter(i => layout[i] === "*").map(i => {
     var _layout$slice$match;
     return {
       i,
       size: ((_layout$slice$match = layout.slice(i).match(/^(\*+)/)) === null || _layout$slice$match === void 0 ? void 0 : _layout$slice$match[1].length) ?? 0
     };
-  }).sort((a, b) => b.size - a.size)[0]) === null || _map$filter$map$sort$ === void 0 ? void 0 : _map$filter$map$sort$.i) ?? -1;
+  }).sort((a, b) => b.size - a.size)[0]) === null || _Array$fill$map$filte === void 0 ? void 0 : _Array$fill$map$filte.i) ?? -1;
 }
 
 var MiningEngine = /*#__PURE__*/function (_Engine) {
@@ -6170,15 +6179,7 @@ var MINING_TASKS = [{
     modifier: "Hot Resistance"
   },
   ready: () => getAccessibleSparkles().length > 0,
-  prepare: () => {
-    assureHotResistance();
-    var minHp = caveInCost(Mine.VOLCANO);
-    if (args.survive && kolmafia.myHp() < minHp) {
-      var hpRestore = 2 * minHp + kolmafia.myHp();
-      if (!kolmafia.restoreHp(hpRestore)) kolmafia.abort("Could not restore enough HP to survive the cave-in.");
-    }
-    if (kolmafia.myHp() === 0) kolmafia.abort("You must have at least 1HP to mine.");
-  },
+  prepare: () => prepareToMine(),
   do: () => {
     // Mine a sparkly coordinate. We will mine all of these until we strike gold, so we might as well pick the first one.
     mineCoordinate(getAccessibleSparkles()[0]);
@@ -6200,15 +6201,7 @@ var MINING_TASKS = [{
     optional: true
   }],
   ready: () => minedSpots(Mine.VOLCANO) === 0 && getAccessibleSparkles().length === 0,
-  prepare: () => {
-    assureHotResistance();
-    var minHp = caveInCost(Mine.VOLCANO);
-    if (args.survive && kolmafia.myHp() < minHp) {
-      var hpRestore = 2 * minHp + kolmafia.myHp();
-      if (!kolmafia.restoreHp(hpRestore)) kolmafia.abort("Could not restore enough HP to survive the cave-in.");
-    }
-    if (kolmafia.myHp() === 0) kolmafia.abort("You must have at least 1HP to mine.");
-  },
+  prepare: () => prepareToMine(),
   do: () => {
     // Find a shiny spot in the second row we can aim for
     var column = findStartOfLongestVein(getState(Mine.VOLCANO).slice(-12, -6));
@@ -6244,7 +6237,7 @@ function main() {
     name: "Oreo",
     ready: () =>
     // Indicative of access to the 70s Volcano
-    kolmafia.canAdventure($location(_templateObject || (_templateObject = _taggedTemplateLiteral(["The SMOOCH Army HQ"])))) && kolmafia.myInebriety() <= kolmafia.inebrietyLimit() && kolmafia.myAdventures() > 0,
+    kolmafia.canAdventure($location(_templateObject || (_templateObject = _taggedTemplateLiteral(["The SMOOCH Army HQ"])))) && kolmafia.myInebriety() <= kolmafia.inebrietyLimit() && (kolmafia.myAdventures() > 0 || countFreeMines() > 0),
     completed: () => kolmafia.totalTurnsPlayed() >= stopAtTurn && countFreeMines() === 0,
     tasks: _toConsumableArray(MINING_TASKS)
   };
