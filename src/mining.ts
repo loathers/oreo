@@ -199,11 +199,11 @@ export function getSparklyClusterSize(
 ): number {
   const key = `${x},${y}`;
   if (
-    x < 0 ||
-    y < 0 ||
-    y >= state.length ||
-    x >= state[0].length ||
-    state[y][x] !== "*" ||
+    x < 1 ||
+    y < 1 ||
+    y > state.length ||
+    x > state[0].length ||
+    state[y - 1][x - 1] !== "*" ||
     visited.has(key)
   ) {
     return 0;

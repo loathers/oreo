@@ -8,6 +8,7 @@
     "build": "rollup -c rollup.config.ts --configPlugin @rollup/plugin-typescript",
     "format": "eslint src --fix --ext .ts && NODE_OPTIONS=\"--experimental-strip-types\" prettier --write .",
     "lint": "eslint src --ext .ts &&  NODE_OPTIONS=\"--experimental-strip-types\" prettier --check .",
+    "test": "vitest run",
     "watch": "rollup -c rollup.config.ts --configPlugin @rollup/plugin-typescript --watch",
     "install-mafia": "create-kolmafia-script --install"
   },
@@ -39,7 +40,8 @@
     "prettier": "^3.8.0",
     "rollup": "^4.55.3",
     "typescript": "^5.9.3",
-    "typescript-eslint": "^8.53.1"
+    "typescript-eslint": "^8.53.1",
+    "vitest": "^4.1.7"
   },
   "packageManager": "yarn@4.12.0"
 }
