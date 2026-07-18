@@ -8,6 +8,10 @@ export const args = Args.create(
       help: "The number of turns to spend mining",
       default: Infinity,
     }),
+    survive: Args.boolean({
+      help: "Whether to avoid hitting zero HP while mining",
+      default: false,
+    }),
     explain: Args.boolean({
       help: "Whether to print explanations for decisions",
       default: false,
