@@ -1,8 +1,8 @@
-import { itemAmount, use } from "kolmafia";
+import { itemAmount, toItem, use } from "kolmafia";
 import { $effect, $item, ensureEffect, get, have } from "libram";
 
 import { args } from "./args.js";
-import { Task } from "./engine.js";
+import { type MiningAccounting, recordItemUse, Task } from "./engine.js";
 import * as Mining from "./mining.js";
 import { Mine } from "./mining.js";
 import { resolvePrice } from "./pricing.js";
@@ -21,8 +21,16 @@ function minedResource(before: Record<ResourceType, number>): ResourceType | nul
   return null;
 }
 
-export function buildMiningTasks(controller: StrategyController): Task[] {
+export function buildMiningTasks(
+  controller: StrategyController,
+  accounting: MiningAccounting,
+): Task[] {
   const dynamitePrice = resolvePrice(args.dynamitePrice, dynamite);
+  accounting.costs.set(dynamite, dynamitePrice);
+  const detectionPotion = args.visibility === "high" ? toItem("potion of detection") : null;
+  if (detectionPotion) {
+    accounting.costs.set(detectionPotion, resolvePrice(args.objectDetectionPrice, detectionPotion));
+  }
   controller.setDynamitePrice(dynamitePrice);
   const miningOutfit = {
     equip: [$item`high-temperature mining drill`, $item`hippy medical kit`],
@@ -82,7 +90,10 @@ export function buildMiningTasks(controller: StrategyController): Task[] {
       after: ["Acquire mining drill"],
       noCombat: true,
       ready: () => args.visibility === "high" && !Mining.hasObjectDetection(Mine.VOLCANO),
-      do: () => ensureEffect($effect`Object Detection`),
+      do: () => {
+        ensureEffect($effect`Object Detection`);
+        if (detectionPotion) recordItemUse(accounting, detectionPotion);
+      },
       completed: () => false,
     },
     {
@@ -126,7 +137,10 @@ export function buildMiningTasks(controller: StrategyController): Task[] {
           crystal: itemAmount(crystal),
           cave: 0,
         };
+        const dynamiteBefore = itemAmount(dynamite);
         mineCoordinate(decision.coordinate);
+        const dynamiteUsed = dynamiteBefore - itemAmount(dynamite);
+        if (dynamiteUsed > 0) recordItemUse(accounting, dynamite, dynamiteUsed);
         controller.recordMine(decision.coordinate, minedResource(before));
         pendingDecision = null;
       },

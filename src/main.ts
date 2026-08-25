@@ -13,7 +13,7 @@ import { $item, $location, sinceKolmafiaRevision } from "libram";
 
 import { args, parsePrice } from "./args.js";
 import { calibrate } from "./calibrate.js";
-import { MiningEngine, Task } from "./engine.js";
+import { type MiningAccounting, MiningEngine, Task } from "./engine.js";
 import { countFreeMines, Mine, visit } from "./mining.js";
 import { resolvePrice } from "./pricing.js";
 import {
@@ -128,6 +128,15 @@ export function main(argstring = "") {
   // Make sure the mine state is up to date
   visit(Mine.VOLCANO);
 
+  const accounting: MiningAccounting = {
+    values: new Map([
+      [$item`unsmoothed velvet`, values.ore],
+      [$item`1,970 carat gold`, values.gold],
+      [$item`New Age healing crystal`, values.crystal],
+    ]),
+    costs: new Map(),
+    used: new Map(),
+  };
   const quest: Quest<Task> = {
     name: "Goldmine",
     ready: () =>
@@ -143,10 +152,11 @@ export function main(argstring = "") {
         args.lambda,
         values,
       ),
+      accounting,
     ),
   };
 
-  const engine = new MiningEngine(getTasks([quest]));
+  const engine = new MiningEngine(getTasks([quest]), accounting);
 
   try {
     engine.run();
