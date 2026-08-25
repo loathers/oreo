@@ -1,7 +1,6 @@
 import { Args, getTasks, Quest } from "grimoire-kolmafia";
 import {
   abort,
-  inaccessibleReason,
   inebrietyLimit,
   myAdventures,
   myInebriety,
@@ -9,7 +8,7 @@ import {
   toItem,
   totalTurnsPlayed,
 } from "kolmafia";
-import { $coinmaster, $item, sinceKolmafiaRevision } from "libram";
+import { $item, get, sinceKolmafiaRevision } from "libram";
 
 import { args, parsePrice } from "./args.js";
 import { calibrate } from "./calibrate.js";
@@ -129,8 +128,9 @@ export function main(argstring = "") {
 
   const stopAtTurn = totalTurnsPlayed() + args.turns;
 
-  const accessError = inaccessibleReason($coinmaster`Disco GiftCo`);
-  if (accessError) abort(accessError);
+  if (!get("hotAirportAlways") && !get("_hotAirportToday")) {
+    abort("You do not have access to That 70s Volcano.");
+  }
 
   // Make sure the mine state is up to date
   visit(Mine.VOLCANO);
