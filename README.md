@@ -1,38 +1,121 @@
-# oreo
+# goldmine
 
-**oreo** is a script meant to farm 1,970 carat gold in [Kingdom of Loathing](https://www.kingdomofloathing.com/). It essentially mines as many twinkly spots in the front two rows of The Velvet / Gold Mine as it can with your hard earned adventures.
+`goldmine` is a KoLmafia TypeScript script for farming the Velvet / Gold Mine with
+selectable mining strategies. It retains Oreo's equipment acquisition, hot-resistance
+handling, optional survival checks, free-mine accounting, session summary, dynamite,
+and holo-wrist-puter support.
 
-To install, run the following command on an up-to-date KoLmafia version:
+## Install
 
-```
-git checkout loathers/oreo release
-```
+Run this in the KoLmafia gCLI:
 
-## Running oreo
-
-In its simplest form, running oreo just requires running the following command in the KoLmafia gCLI:
-
-```
-oreo 10
+```text
+git checkout mark-e-duda/goldmine release
 ```
 
-Where "10" would be replaced by an integer telling the script how many turns you would like to spend mining. If you do not include a number after `oreo`, the script will just run until you're out of adventures. If you would like to use only your free mining skills, provide "0".
+## Build
 
+This project uses Oreo's Rollup/Babel pipeline and produces:
+
+```text
+dist/scripts/goldmine/goldmine.js
 ```
-oreo help
+
+After restoring the dependencies in an environment where package installation is
+allowed:
+
+```text
+yarn build
+yarn install-mafia
 ```
 
-Will list additional options that you may run, the most notable of which is the `explain` argument, which will instruct oreo to output its reason for each action it takes in a handsome green font.
+## Usage
 
-## Documentation
+```text
+goldmine 100 strategy=ev-cluster visibility=auto
+goldmine help
+```
 
-One important alert for all interested users:
+The positional number is the number of turns to spend. As in Oreo, `0` uses only
+free mining actions and omitting it runs until adventures are exhausted.
 
-:warning: **<span style="color:red">OREO WILL NOT DIET FOR YOU; IT WILL JUST USE ADVENTURES. FILL YOUR ORGANS!</span>** :warning:
+### Strategies
 
-To report bugs, please post issues on this GitHub repository.
+| Strategy | Behavior |
+| --- | --- |
+| `pjb` | Mine accessible sparkles in the front two rows, reset on gold or when dry |
+| `oreo` | PJB loop plus Oreo's longest-second-row-vein opening move |
+| `ev` | Route to the known sparkle with the best posterior EV minus λ×turns |
+| `ev-cluster` | Same EV policy with the connected six-tile velvet posterior |
 
-## FAQS
+The default is `ev-cluster`.
 
-- The script is pronounced ore-o, because it helps you mine ore. I don't understand why so many people get this wrong.
-- Object Detection is supported and some initial conservative investigation indicates it may be worth 200 extra mpa. You need to acquire the effect yourself.
+### Visibility
+
+Visibility is independent of strategy:
+
+| Mode | Behavior |
+| --- | --- |
+| `low` | Ignore non-minable sparkle information |
+| `auto` | Use Object Detection when already available; otherwise use low visibility |
+| `high` | Maintain Object Detection with potions of detection |
+
+The default is `auto`. High visibility remembers every revealed sparkle for the
+remainder of the current cavern even if the effect expires. Unused effect turns
+naturally carry across cavern resets.
+
+`objectDetectionPrice=120` sets the economic and maximum acquisition price per
+potion. Use `objectDetectionPrice=mall` to query its current Mall price.
+
+### Dynamite
+
+Minin' dynamite makes a minable non-sparkle route tile free. The script buys it
+when its price is below the strategy's estimated value of the saved turn.
+`dynamitePrice` defaults to `3400`; use `dynamitePrice=mall` to query the current
+Mall price. A positive `lambda` override also becomes the saved-turn value for
+EV strategies.
+
+### EV threshold
+
+`lambda=0` selects the calibrated default:
+
+| EV model | Low visibility | High visibility |
+| --- | ---: | ---: |
+| Per-tile | 3571 | 3571 |
+| Cluster | 3714 | 3500 |
+
+Override it with, for example, `lambda=3600`.
+
+### Calibrating λ
+
+EV strategies can sweep λ against a deterministic bundled synthetic board
+generator:
+
+```text
+goldmine calibrate strategy=ev-cluster visibility=high
+goldmine calibrate strategy=ev visibility=low dynamitePrice=mall oreValue=mall
+```
+
+The default coarse sweep is 500–9000 in steps of 500, followed by six fine
+points around the coarse peak. It generates 4000 boards with seed 12345 and a
+0.496 probability of a second gold. Override these with `calibrationBoards`,
+`calibrationSeed`, and `calibrationSecondGoldChance`; override the sweep with
+`calibrationMin`, `calibrationMax`, `calibrationStep`, and
+`calibrationFineSteps`.
+
+`objectDetectionPrice`, `dynamitePrice`, `oreValue`, `goldValue`, and
+`crystalValue` accept either a number or `mall`. The same resource values are
+used by normal live EV decisions. `visibility=auto` calibrates as low visibility
+because calibration does not assume an existing Object Detection effect.
+
+## Other options
+
+- `survive=true` restores enough HP to survive cave-ins.
+- `explain=true` prints each strategy decision.
+
+The script does not diet for you. Fill your organs before running it.
+
+## Credits
+
+The KoLmafia task engine, mining API, equipment handling, and build scaffold are
+derived from [loathers/oreo](https://github.com/loathers/oreo), licensed under MIT.

@@ -46,20 +46,5 @@ export function mineCoordinate(coords: MiningCoordinate) {
       .join("\n")}\nPicked (${coords.join(",")})`,
   );
 
-  Mining.mineCoordinate(Mine.VOLCANO, coords);
-}
-
-export function getAccessibleSparkles() {
-  return Mining.getAccessibleSparkles(Mine.VOLCANO).filter(([, y]) => [5, 6].includes(y));
-}
-
-export function findStartOfLongestVein(layout: string) {
-  return (
-    Array(layout.length)
-      .fill(0)
-      .map((_, i) => i)
-      .filter((i) => layout[i] === "*")
-      .map((i) => ({ i, size: layout.slice(i).match(/^(\*+)/)?.[1].length ?? 0 }))
-      .sort((a, b) => b.size - a.size)[0]?.i ?? -1
-  );
+  return Mining.mineCoordinate(Mine.VOLCANO, coords);
 }

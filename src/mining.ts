@@ -9,7 +9,6 @@ import {
   extractItems,
   get,
   have,
-  tuple,
 } from "libram";
 
 /**
@@ -64,67 +63,6 @@ export function caveInCost(mine: Mine) {
     default:
       return 0;
   }
-}
-
-const stateIndexToCoord = (position: number) => {
-  const row = Math.floor(position / 6);
-  const col = position % 6;
-  return tuple<MiningCoordinate>(col + 1, row + 1);
-};
-
-const getAccessibleSparklesForIndex = (state: string, index: number) => {
-  // Translate index to 0-indexed coord
-  const coords = stateIndexToCoord(index);
-  const [col, row] = [coords[0] - 1, coords[1] - 1];
-
-  // Front row sparkles are always accessible
-  if (row >= 5 && state[index] === "*") return [coords];
-  // Otherwise we are looking for open spots only
-  if (state[index] !== "o") return [];
-
-  // Look at the cardinal mask for sparkles
-  return [
-    [-1, 0],
-    [1, 0],
-    [0, -1],
-    [0, 1],
-  ]
-    .map(([dCol, dRow]) => {
-      const neighborCol = col + dCol;
-      const neighborRow = row + dRow;
-      if (neighborCol < 0 || neighborCol > 5 || neighborRow < 0 || neighborRow > 5) return null;
-      return neighborRow * 6 + neighborCol;
-    })
-    .filter((i) => i !== null)
-    .filter((i) => state[i] === "*")
-    .map(stateIndexToCoord);
-};
-
-/**
- * List all sparkly rocks adjacent to an open space. This will be simply a list of all sparkly rocks
- * without some form of Object Detection.
- *
- * This assumes all open spots are accessible. If spots at the back of the mine were somehow to be open
- * this would be no longer be correct.
- *
- * @param mine Which mine
- * @returns List of all sparkly rocks adjacent to an open space
- */
-export function getAccessibleSparkles(mine: Mine) {
-  const state = get(`mineState${mine}`, "");
-  return Array(state.length)
-    .fill(0)
-    .flatMap((v, position) => getAccessibleSparklesForIndex(state, position));
-}
-
-/**
- * @param mine Which mine
- * @returns Returns number of mined spots in the current cavern
- */
-export function minedSpots(mine: Mine) {
-  return get(`mineState${mine}`, "")
-    .split("")
-    .filter((c) => c === "o").length;
 }
 
 /**

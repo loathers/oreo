@@ -25,7 +25,7 @@ export class MiningEngine extends Engine<never, Task> {
     super.destruct();
 
     const diff = Session.current().diff(this.session);
-    printHighlight(`oreo has run ${diff.totalTurns} turns, and produced the following items:`);
+    printHighlight(`goldmine has run ${diff.totalTurns} turns, and produced the following items:`);
     for (const [item, quantity] of diff.items) {
       printHighlight(` ${item}: ${quantity}`);
     }

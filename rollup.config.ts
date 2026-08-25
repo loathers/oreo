@@ -59,7 +59,7 @@ const baseSettings = {
     : undefined,
 };
 
-export default [{ "scripts/oreo/oreo": "src/main.ts" }].map((input) => ({
+export default [{ "scripts/goldmine/goldmine": "src/main.ts" }].map((input) => ({
   input,
   ...baseSettings,
 }));

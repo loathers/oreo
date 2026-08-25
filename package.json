@@ -1,13 +1,14 @@
 {
-  "name": "oreo",
+  "name": "goldmine",
   "version": "0.0.0",
-  "author": "Sam Gaus <sam@gaus.co.uk>",
-  "homepage": "",
+  "author": "Mark Duda <markeduda@gmail.com>",
+  "homepage": "https://github.com/mark-e-duda/goldmine",
   "license": "MIT",
   "scripts": {
     "build": "rollup -c rollup.config.ts --configPlugin @rollup/plugin-typescript",
     "format": "eslint src --fix --ext .ts && NODE_OPTIONS=\"--experimental-strip-types\" prettier --write .",
     "lint": "eslint src --ext .ts &&  NODE_OPTIONS=\"--experimental-strip-types\" prettier --check .",
+    "test": "node --experimental-strip-types src/strategy.test.ts",
     "watch": "rollup -c rollup.config.ts --configPlugin @rollup/plugin-typescript --watch",
     "install-mafia": "create-kolmafia-script --install"
   },
