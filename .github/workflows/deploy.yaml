@@ -10,6 +10,9 @@ on:
 env:
   node-version: "24"
 
+permissions:
+  contents: write
+
 jobs:
   test:
     runs-on: ubuntu-latest
