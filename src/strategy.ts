@@ -49,8 +49,10 @@ function statePositionToIndex(position: number): number {
 }
 
 export function isLegal(index: number, opened: Set<number>): boolean {
-  return !opened.has(index) &&
-    (rowOf(index) === 0 || neighbors[index].some((neighbor) => opened.has(neighbor)));
+  return (
+    !opened.has(index) &&
+    (rowOf(index) === 0 || neighbors[index].some((neighbor) => opened.has(neighbor)))
+  );
 }
 
 type Cluster = { tiles: number[]; weight: number };
@@ -82,20 +84,17 @@ const ORE_CLUSTERS: Cluster[] = (() => {
   for (const start of region) grow([start]);
   return clusters.map((tiles) => ({
     tiles,
-    weight: tiles.reduce(
-      (weight, tile) => weight * CLUSTER_ROW_WEIGHT[rowOf(tile)],
-      1,
-    ),
+    weight: tiles.reduce((weight, tile) => weight * CLUSTER_ROW_WEIGHT[rowOf(tile)], 1),
   }));
 })();
 
 function mulberry32(seed: number) {
   return () => {
     seed |= 0;
-    seed = seed + 0x6d2b79f5 | 0;
-    let value = Math.imul(seed ^ seed >>> 15, 1 | seed);
-    value = value + Math.imul(value ^ value >>> 7, 61 | value) ^ value;
-    return ((value ^ value >>> 14) >>> 0) / 4294967296;
+    seed = (seed + 0x6d2b79f5) | 0;
+    let value = Math.imul(seed ^ (seed >>> 15), 1 | seed);
+    value = (value + Math.imul(value ^ (value >>> 7), 61 | value)) ^ value;
+    return ((value ^ (value >>> 14)) >>> 0) / 4294967296;
   };
 }
 
@@ -237,7 +236,8 @@ export class StrategyController {
   }
 
   setDynamitePrice(price: number): void {
-    if (!Number.isFinite(price) || price < 0) throw new Error("Dynamite price must be non-negative.");
+    if (!Number.isFinite(price) || price < 0)
+      throw new Error("Dynamite price must be non-negative.");
     this.dynamitePrice = price;
   }
 
@@ -284,7 +284,7 @@ export class StrategyController {
     if (this.strategy === "oreo" && this.fullMineSeen) {
       let bestStart = -1;
       let bestLength = 0;
-      for (let start = 0; start < 6;) {
+      for (let start = 0; start < 6; ) {
         if (!this.knownSparkles.has(6 + start)) {
           start++;
           continue;
@@ -302,9 +302,10 @@ export class StrategyController {
     return {
       action: "mine",
       coordinate: indexToCoordinate(column),
-      reason: column === CENTER
-        ? "probing the center of the front row"
-        : "probing above the longest second-row sparkle vein",
+      reason:
+        column === CENTER
+          ? "probing the center of the front row"
+          : "probing above the longest second-row sparkle vein",
     };
   }
 
@@ -329,9 +330,7 @@ export class StrategyController {
       const routeCost = path.reduce(
         (cost, index) =>
           cost +
-          (this.knownDull.has(index) && this.shouldUseDynamite()
-            ? this.dynamitePrice
-            : lambda),
+          (this.knownDull.has(index) && this.shouldUseDynamite() ? this.dynamitePrice : lambda),
         0,
       );
       const score = reward - routeCost;
@@ -391,40 +390,31 @@ export class StrategyController {
       oreRemaining,
       crystalRemaining,
       goldRemaining,
-      caveRemaining: Math.max(
-        0,
-        targetCount - oreRemaining - crystalRemaining - goldRemaining,
-      ),
+      caveRemaining: Math.max(0, targetCount - oreRemaining - crystalRemaining - goldRemaining),
     };
   }
 
   private perTileExpectedValues(): number[] {
     const result = Array(36).fill(0) as number[];
     const targets = [...this.knownSparkles];
-    const targetCount = this.fullMineSeen
-      ? targets.length
-      : TARGETS_PER_MINE - this.observed.size;
+    const targetCount = this.fullMineSeen ? targets.length : TARGETS_PER_MINE - this.observed.size;
     const counts = this.remainingCounts(targetCount);
     const oreProbability = new Map<number, number>();
 
     if (this.fullMineSeen) {
-      const eligible = targets.filter((index) =>
-        rowOf(index) >= 2 &&
-        neighbors[index].some((neighbor) =>
-          this.observed.get(neighbor) === "ore" ||
-          this.knownSparkles.has(neighbor)));
-      const weightTotal = eligible.reduce(
-        (sum, index) => sum + ROW_ORE_WEIGHT[rowOf(index)],
-        0,
+      const eligible = targets.filter(
+        (index) =>
+          rowOf(index) >= 2 &&
+          neighbors[index].some(
+            (neighbor) => this.observed.get(neighbor) === "ore" || this.knownSparkles.has(neighbor),
+          ),
       );
+      const weightTotal = eligible.reduce((sum, index) => sum + ROW_ORE_WEIGHT[rowOf(index)], 0);
       for (const index of eligible) {
         oreProbability.set(
           index,
           weightTotal > 0
-            ? Math.min(
-                1,
-                counts.oreRemaining * ROW_ORE_WEIGHT[rowOf(index)] / weightTotal,
-              )
+            ? Math.min(1, (counts.oreRemaining * ROW_ORE_WEIGHT[rowOf(index)]) / weightTotal)
             : 0,
         );
       }
@@ -433,13 +423,12 @@ export class StrategyController {
     for (const index of targets) {
       let pOre = oreProbability.get(index) ?? 0;
       if (!this.fullMineSeen && rowOf(index) >= 2 && counts.oreRemaining > 0) {
-        const adjacentPossibleOre = neighbors[index].some((neighbor) =>
-          this.observed.get(neighbor) === "ore" ||
-          (!this.opened.has(neighbor) && rowOf(neighbor) >= 2));
-        pOre = Math.min(
-          1,
-          ROW_ORE_WEIGHT[rowOf(index)] * (adjacentPossibleOre ? 1 : 0.3),
+        const adjacentPossibleOre = neighbors[index].some(
+          (neighbor) =>
+            this.observed.get(neighbor) === "ore" ||
+            (!this.opened.has(neighbor) && rowOf(neighbor) >= 2),
         );
+        pOre = Math.min(1, ROW_ORE_WEIGHT[rowOf(index)] * (adjacentPossibleOre ? 1 : 0.3));
       }
       result[index] = this.nonOreAdjustedValue(pOre, counts);
     }
@@ -457,9 +446,7 @@ export class StrategyController {
     for (const index of this.opened) {
       if (!knownOre.has(index)) knownNonOre.add(index);
     }
-    const subset = this.fullMineSeen
-      ? new Set([...this.knownSparkles, ...knownOre])
-      : null;
+    const subset = this.fullMineSeen ? new Set([...this.knownSparkles, ...knownOre]) : null;
     const pOre = clusterOrePosterior(knownOre, knownNonOre, subset);
     const targetCount = this.fullMineSeen
       ? this.knownSparkles.size
@@ -467,10 +454,7 @@ export class StrategyController {
     const counts = this.remainingCounts(targetCount);
     const result = Array(36).fill(0) as number[];
     for (const index of this.knownSparkles) {
-      result[index] = this.nonOreAdjustedValue(
-        counts.oreRemaining > 0 ? pOre[index] : 0,
-        counts,
-      );
+      result[index] = this.nonOreAdjustedValue(counts.oreRemaining > 0 ? pOre[index] : 0, counts);
     }
     return result;
   }
@@ -479,18 +463,11 @@ export class StrategyController {
     pOre: number,
     counts: ReturnType<StrategyController["remainingCounts"]>,
   ): number {
-    const nonOreTotal =
-      counts.goldRemaining + counts.crystalRemaining + counts.caveRemaining;
+    const nonOreTotal = counts.goldRemaining + counts.crystalRemaining + counts.caveRemaining;
     const pNonOre = 1 - pOre;
-    const pGold = nonOreTotal > 0
-      ? pNonOre * counts.goldRemaining / nonOreTotal
-      : 0;
-    const pCrystal = nonOreTotal > 0
-      ? pNonOre * counts.crystalRemaining / nonOreTotal
-      : 0;
-    return pOre * this.values.ore +
-      pGold * this.values.gold +
-      pCrystal * this.values.crystal;
+    const pGold = nonOreTotal > 0 ? (pNonOre * counts.goldRemaining) / nonOreTotal : 0;
+    const pCrystal = nonOreTotal > 0 ? (pNonOre * counts.crystalRemaining) / nonOreTotal : 0;
+    return pOre * this.values.ore + pGold * this.values.gold + pCrystal * this.values.crystal;
   }
 
   private shortestPath(starts: Set<number>, target: number): number[] | null {

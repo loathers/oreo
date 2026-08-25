@@ -9,21 +9,18 @@ import {
 
 const calibrationBoards = makeCalibrationBoards(10, 12345, 0.496);
 assert.equal(calibrationBoards.length, 10);
-assert.equal(calibrationBoards.every((board) => board.length === 36), true);
+assert.equal(
+  calibrationBoards.every((board) => board.length === 36),
+  true,
+);
 assert.equal(calibrationBoards[0], makeCalibrationBoards(1, 12345, 0.496)[0]);
 for (const board of calibrationBoards) {
   assert.equal([...board].filter((tile) => tile === "o").length, 6);
   assert.equal([...board].filter((tile) => tile === "r").length, 3);
   assert.equal([...board].filter((tile) => tile !== "e").length, 15);
 }
-assert.equal(
-  [...makeCalibrationBoards(1, 1, 0)[0]].filter((tile) => tile === "g").length,
-  1,
-);
-assert.equal(
-  [...makeCalibrationBoards(1, 1, 1)[0]].filter((tile) => tile === "g").length,
-  2,
-);
+assert.equal([...makeCalibrationBoards(1, 1, 0)[0]].filter((tile) => tile === "g").length, 1);
+assert.equal([...makeCalibrationBoards(1, 1, 1)[0]].filter((tile) => tile === "g").length, 2);
 
 function mineState(entries: Array<[position: number, value: string]>): string {
   const state = Array(36).fill(".");
@@ -45,13 +42,17 @@ assert.deepEqual(pjb.decide(), {
 const legalPjb = new StrategyController("pjb", "high");
 legalPjb.update(mineState([[24, "*"]]), true);
 assert.deepEqual(legalPjb.decide().action, "mine");
-assert.deepEqual(
-  (legalPjb.decide() as { coordinate: [number, number] }).coordinate,
-  [4, 6],
-);
+assert.deepEqual((legalPjb.decide() as { coordinate: [number, number] }).coordinate, [4, 6]);
 
 const oreo = new StrategyController("oreo", "high");
-oreo.update(mineState([[25, "*"], [26, "*"], [28, "*"]]), true);
+oreo.update(
+  mineState([
+    [25, "*"],
+    [26, "*"],
+    [28, "*"],
+  ]),
+  true,
+);
 assert.deepEqual((oreo.decide() as { coordinate: [number, number] }).coordinate, [2, 6]);
 
 const lowEv = new StrategyController("ev-cluster", "low");
@@ -66,7 +67,10 @@ const overriddenEv = new StrategyController("ev", "low", 6000);
 overriddenEv.setDynamitePrice(5500);
 assert.equal(overriddenEv.shouldUseDynamite(), true);
 
-const pricedRoute = mineState([[24, "*"], [33, "o"]]);
+const pricedRoute = mineState([
+  [24, "*"],
+  [33, "o"],
+]);
 const noDynamite = new StrategyController("ev", "high");
 noDynamite.update(pricedRoute, true);
 assert.equal(noDynamite.decide().action, "reset");

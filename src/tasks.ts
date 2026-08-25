@@ -31,10 +31,7 @@ export function buildMiningTasks(controller: StrategyController): Task[] {
   let pendingDecision: Decision | null = null;
 
   const selectDecision = () => {
-    controller.update(
-      Mining.getState(Mine.VOLCANO),
-      Mining.hasObjectDetection(Mine.VOLCANO),
-    );
+    controller.update(Mining.getState(Mine.VOLCANO), Mining.hasObjectDetection(Mine.VOLCANO));
     pendingDecision = controller.decide();
     return pendingDecision;
   };
@@ -71,8 +68,7 @@ export function buildMiningTasks(controller: StrategyController): Task[] {
       after: ["Acquire mining drill", "Acquire hippy medical kit"],
       noCombat: true,
       outfit: miningOutfit,
-      ready: () =>
-        controller.shouldResetAfterGold() && get("mineLayout6").includes("goldnugget"),
+      ready: () => controller.shouldResetAfterGold() && get("mineLayout6").includes("goldnugget"),
       prepare: () => assureHotResistance(),
       do: () => {
         explain("Resetting after finding gold.");
@@ -85,8 +81,7 @@ export function buildMiningTasks(controller: StrategyController): Task[] {
       name: "Maintain Object Detection",
       after: ["Acquire mining drill"],
       noCombat: true,
-      ready: () =>
-        args.visibility === "high" && !Mining.hasObjectDetection(Mine.VOLCANO),
+      ready: () => args.visibility === "high" && !Mining.hasObjectDetection(Mine.VOLCANO),
       do: () => ensureEffect($effect`Object Detection`),
       completed: () => false,
     },
