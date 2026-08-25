@@ -121,8 +121,9 @@ override the generator with `calibrationSeed` and
 `crystalValue` accept either a number or `mall`. The same resource values are
 used by normal live EV decisions. `visibility=auto` calibrates as low visibility
 because calibration does not assume an existing Object Detection effect.
-Calibration prints the `lambda` override to use; it does not replace the bundled
-defaults.
+Calibration prints a copy-pasteable command containing the resulting `lambda`
+and every resolved resource and consumable price; it does not replace the
+bundled defaults.
 
 ## Other options
 

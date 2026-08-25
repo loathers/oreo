@@ -87,15 +87,17 @@ export function main(argstring = "") {
       `Calibrating ${args.strategy}/${args.visibility} on ${args.calibrationBoards} synthetic mines...`,
       "blue",
     );
+    const dynamitePrice = resolvePrice(args.dynamitePrice, $item`minin' dynamite`);
+    const objectDetectionPrice =
+      args.visibility === "high"
+        ? resolvePrice(args.objectDetectionPrice, toItem("potion of detection"))
+        : 0;
     const result = calibrate({
       strategy: args.strategy,
       visibility: args.visibility as VisibilityMode,
       values,
-      dynamitePrice: resolvePrice(args.dynamitePrice, $item`minin' dynamite`),
-      objectDetectionPrice:
-        args.visibility === "high"
-          ? resolvePrice(args.objectDetectionPrice, toItem("potion of detection"))
-          : 0,
+      dynamitePrice,
+      objectDetectionPrice,
       min: args.calibrationMin,
       max: args.calibrationMax,
       step: args.calibrationStep,
@@ -117,7 +119,9 @@ export function main(argstring = "") {
     );
     print(
       `Use: goldmine strategy=${args.strategy} visibility=${args.visibility} ` +
-        `lambda=${result.lambda}`,
+        `lambda=${result.lambda} oreValue=${values.ore} goldValue=${values.gold} ` +
+        `crystalValue=${values.crystal} dynamitePrice=${dynamitePrice} ` +
+        `objectDetectionPrice=${objectDetectionPrice}`,
       "blue",
     );
     return;
