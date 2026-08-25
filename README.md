@@ -41,12 +41,12 @@ free mining actions and omitting it runs until adventures are exhausted.
 
 ### Strategies
 
-| Strategy | Behavior |
-| --- | --- |
-| `pjb` | Mine accessible sparkles in the front two rows, reset on gold or when dry |
-| `oreo` | PJB loop plus Oreo's longest-second-row-vein opening move |
-| `ev` | Route to the known sparkle with the best posterior EV minus λ×turns |
-| `ev-cluster` | Same EV policy with the connected six-tile velvet posterior |
+| Strategy     | Behavior                                                                  |
+| ------------ | ------------------------------------------------------------------------- |
+| `pjb`        | Mine accessible sparkles in the front two rows, reset on gold or when dry |
+| `oreo`       | PJB loop plus Oreo's longest-second-row-vein opening move                 |
+| `ev`         | Route to the known sparkle with the best posterior EV minus λ×turns       |
+| `ev-cluster` | Same EV policy with the connected six-tile velvet posterior               |
 
 The default is `ev-cluster`.
 
@@ -54,11 +54,11 @@ The default is `ev-cluster`.
 
 Visibility is independent of strategy:
 
-| Mode | Behavior |
-| --- | --- |
-| `low` | Ignore non-minable sparkle information |
+| Mode   | Behavior                                                                  |
+| ------ | ------------------------------------------------------------------------- |
+| `low`  | Ignore non-minable sparkle information                                    |
 | `auto` | Use Object Detection when already available; otherwise use low visibility |
-| `high` | Maintain Object Detection with potions of detection |
+| `high` | Maintain Object Detection with potions of detection                       |
 
 The default is `auto`. High visibility remembers every revealed sparkle for the
 remainder of the current cavern even if the effect expires. Unused effect turns
@@ -81,9 +81,9 @@ EV strategies.
 `lambda=0` selects the calibrated default:
 
 | EV model | Low visibility | High visibility |
-| --- | ---: | ---: |
-| Per-tile | 3571 | 3571 |
-| Cluster | 3714 | 3500 |
+| -------- | -------------: | --------------: |
+| Per-tile |           3571 |            3571 |
+| Cluster  |           3714 |            3500 |
 
 Override it with, for example, `lambda=3600`.
 
