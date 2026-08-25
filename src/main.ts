@@ -1,7 +1,7 @@
 import { Args, getTasks, Quest } from "grimoire-kolmafia";
 import {
   abort,
-  canAdventure,
+  inaccessibleReason,
   inebrietyLimit,
   myAdventures,
   myInebriety,
@@ -9,12 +9,12 @@ import {
   toItem,
   totalTurnsPlayed,
 } from "kolmafia";
-import { $item, $location, sinceKolmafiaRevision } from "libram";
+import { $coinmaster, $item, sinceKolmafiaRevision } from "libram";
 
 import { args, parsePrice } from "./args.js";
 import { calibrate } from "./calibrate.js";
 import { type MiningAccounting, MiningEngine, Task } from "./engine.js";
-import { countFreeMines, Mine, visit } from "./mining.js";
+import { countFreeMines, getState, Mine, visit } from "./mining.js";
 import { resolvePrice } from "./pricing.js";
 import {
   STRATEGIES,
@@ -129,8 +129,14 @@ export function main(argstring = "") {
 
   const stopAtTurn = totalTurnsPlayed() + args.turns;
 
+  const accessError = inaccessibleReason($coinmaster`Disco GiftCo`);
+  if (accessError) abort(accessError);
+
   // Make sure the mine state is up to date
   visit(Mine.VOLCANO);
+  if (getState(Mine.VOLCANO).length !== 36) {
+    abort("Could not access the Velvet / Gold Mine.");
+  }
 
   const accounting: MiningAccounting = {
     values: new Map([
@@ -143,11 +149,7 @@ export function main(argstring = "") {
   };
   const quest: Quest<Task> = {
     name: "Goldmine",
-    ready: () =>
-      // Indicative of access to the 70s Volcano
-      canAdventure($location`The SMOOCH Army HQ`) &&
-      myInebriety() <= inebrietyLimit() &&
-      (myAdventures() > 0 || countFreeMines() > 0),
+    ready: () => myInebriety() <= inebrietyLimit() && (myAdventures() > 0 || countFreeMines() > 0),
     completed: () => totalTurnsPlayed() >= stopAtTurn && countFreeMines() === 0,
     tasks: buildMiningTasks(
       new StrategyController(
