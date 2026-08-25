@@ -83,6 +83,10 @@ export function main(argstring = "") {
           "positive integer boards, and 0 <= P(2 gold) <= 1.",
       );
     }
+    print(
+      `Calibrating ${args.strategy}/${args.visibility} on ${args.calibrationBoards} synthetic mines...`,
+      "blue",
+    );
     const result = calibrate({
       strategy: args.strategy,
       visibility: args.visibility as VisibilityMode,
@@ -99,6 +103,12 @@ export function main(argstring = "") {
       boardCount: args.calibrationBoards,
       seed: args.calibrationSeed,
       secondGoldChance: args.calibrationSecondGoldChance,
+      onProgress: (completed, total, lambda) =>
+        print(
+          `Calibration ${completed}/${total} (${Math.round((100 * completed) / total)}%): ` +
+            `lambda=${lambda}`,
+          "blue",
+        ),
     });
     print(
       `Calibrated ${args.strategy}/${args.visibility} on ${result.sampleSize} synthetic mines: ` +

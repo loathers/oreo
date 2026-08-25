@@ -88,6 +88,7 @@ export type CalibrationOptions = {
   boardCount: number;
   seed: number;
   secondGoldChance: number;
+  onProgress?: (completed: number, total: number, lambda: number) => void;
 };
 
 export function calibrate(options: CalibrationOptions) {
@@ -104,6 +105,7 @@ export function calibrate(options: CalibrationOptions) {
     boardCount,
     seed,
     secondGoldChance,
+    onProgress,
   } = options;
   if (strategy !== "ev" && strategy !== "ev-cluster") {
     throw new Error("Calibration is only available for EV strategies.");
@@ -146,13 +148,20 @@ export function calibrate(options: CalibrationOptions) {
     rates.set(lambda, result);
     return result;
   };
-  let best = coarse.reduce((a, b) => (rate(b) > rate(a) ? b : a));
+  const total = coarse.length + fineSteps;
+  let completed = 0;
+  let best = coarse[0];
+  for (const lambda of coarse) {
+    if (rate(lambda) > rate(best)) best = lambda;
+    onProgress?.(++completed, total, lambda);
+  }
   const bestIndex = coarse.indexOf(best);
   const low = coarse[Math.max(0, bestIndex - 1)];
   const high = coarse[Math.min(coarse.length - 1, bestIndex + 1)];
   for (let point = 1; point <= fineSteps; point++) {
     const lambda = Math.round(low + ((high - low) * point) / (fineSteps + 1));
     if (rate(lambda) > rate(best)) best = lambda;
+    onProgress?.(++completed, total, lambda);
   }
   return { lambda: best, rate: rate(best), sampleSize: boards.length };
 }
