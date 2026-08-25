@@ -111,10 +111,16 @@ export function calibrate(options: CalibrationOptions) {
   if (min < 0 || max <= min || step <= 0 || fineSteps < 0) {
     throw new Error("Calibration requires 0 <= min < max, step > 0, and fineSteps >= 0.");
   }
-  if (!Number.isInteger(boardCount) || boardCount <= 0 ||
-      !Number.isFinite(seed) ||
-      secondGoldChance < 0 || secondGoldChance > 1) {
-    throw new Error("Calibration requires positive integer boards, a seed, and 0 <= P(2 gold) <= 1.");
+  if (
+    !Number.isInteger(boardCount) ||
+    boardCount <= 0 ||
+    !Number.isFinite(seed) ||
+    secondGoldChance < 0 ||
+    secondGoldChance > 1
+  ) {
+    throw new Error(
+      "Calibration requires positive integer boards, a seed, and 0 <= P(2 gold) <= 1.",
+    );
   }
   const boards = makeCalibrationBoards(boardCount, seed, secondGoldChance);
 
@@ -140,14 +146,12 @@ export function calibrate(options: CalibrationOptions) {
     rates.set(lambda, result);
     return result;
   };
-  let best = coarse.reduce((a, b) => rate(b) > rate(a) ? b : a);
+  let best = coarse.reduce((a, b) => (rate(b) > rate(a) ? b : a));
   const bestIndex = coarse.indexOf(best);
   const low = coarse[Math.max(0, bestIndex - 1)];
   const high = coarse[Math.min(coarse.length - 1, bestIndex + 1)];
   for (let point = 1; point <= fineSteps; point++) {
-    const lambda = Math.round(
-      low + (high - low) * point / (fineSteps + 1),
-    );
+    const lambda = Math.round(low + ((high - low) * point) / (fineSteps + 1));
     if (rate(lambda) > rate(best)) best = lambda;
   }
   return { lambda: best, rate: rate(best), sampleSize: boards.length };

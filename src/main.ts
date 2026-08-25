@@ -68,17 +68,19 @@ export function main(argstring = "") {
     if (args.strategy !== "ev" && args.strategy !== "ev-cluster") {
       abort("Calibration is only available for the ev and ev-cluster strategies.");
     }
-    if (args.calibrationMin < 0 ||
-        args.calibrationMax <= args.calibrationMin ||
-        args.calibrationStep <= 0 ||
-        args.calibrationFineSteps < 0 ||
-        !Number.isInteger(args.calibrationBoards) ||
-        args.calibrationBoards <= 0 ||
-        args.calibrationSecondGoldChance < 0 ||
-        args.calibrationSecondGoldChance > 1) {
+    if (
+      args.calibrationMin < 0 ||
+      args.calibrationMax <= args.calibrationMin ||
+      args.calibrationStep <= 0 ||
+      args.calibrationFineSteps < 0 ||
+      !Number.isInteger(args.calibrationBoards) ||
+      args.calibrationBoards <= 0 ||
+      args.calibrationSecondGoldChance < 0 ||
+      args.calibrationSecondGoldChance > 1
+    ) {
       abort(
         "Calibration requires 0 <= min < max, step > 0, fineSteps >= 0, " +
-        "positive integer boards, and 0 <= P(2 gold) <= 1.",
+          "positive integer boards, and 0 <= P(2 gold) <= 1.",
       );
     }
     const result = calibrate({
@@ -86,9 +88,10 @@ export function main(argstring = "") {
       visibility: args.visibility as VisibilityMode,
       values,
       dynamitePrice: resolvePrice(args.dynamitePrice, $item`minin' dynamite`),
-      objectDetectionPrice: args.visibility === "high"
-        ? resolvePrice(args.objectDetectionPrice, toItem("potion of detection"))
-        : 0,
+      objectDetectionPrice:
+        args.visibility === "high"
+          ? resolvePrice(args.objectDetectionPrice, toItem("potion of detection"))
+          : 0,
       min: args.calibrationMin,
       max: args.calibrationMax,
       step: args.calibrationStep,
@@ -99,12 +102,12 @@ export function main(argstring = "") {
     });
     print(
       `Calibrated ${args.strategy}/${args.visibility} on ${result.sampleSize} synthetic mines: ` +
-      `lambda=${result.lambda}, rate=${result.rate.toFixed(1)}`,
+        `lambda=${result.lambda}, rate=${result.rate.toFixed(1)}`,
       "blue",
     );
     print(
       `Use: goldmine strategy=${args.strategy} visibility=${args.visibility} ` +
-      `lambda=${result.lambda}`,
+        `lambda=${result.lambda}`,
       "blue",
     );
     return;
