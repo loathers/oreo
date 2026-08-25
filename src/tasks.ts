@@ -120,7 +120,7 @@ export function buildMiningTasks(
         ],
       }),
       acquire: controller.shouldUseDynamite()
-        ? [{ item: dynamite, price: dynamitePrice, optional: true }]
+        ? [{ item: dynamite, optional: true }]
         : [],
       ready: () => selectDecision().action === "mine",
       prepare: () => prepareToMine(),
