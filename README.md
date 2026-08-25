@@ -72,8 +72,8 @@ Mall price for EV calibration; normal KoLmafia acquisition limits still apply.
 
 Minin' dynamite makes a minable non-sparkle route tile free. The script buys it
 when its price is below the strategy's estimated value of the saved turn.
-`dynamitePrice` defaults to `3400`; use `dynamitePrice=mall` to query the current
-Mall price. A positive `lambda` override also becomes the saved-turn value for
+`dynamitePrice` defaults to `mall`, which queries the current Mall price. A
+positive `lambda` override also becomes the saved-turn value for
 EV strategies.
 
 ### EV threshold

@@ -34,7 +34,7 @@ export const args = Args.create(
     }),
     dynamitePrice: Args.string({
       help: 'Minin\' dynamite price, or "mall" to query the current Mall price',
-      default: "3400",
+      default: "mall",
     }),
     oreValue: Args.string({
       help: 'Unsmoothed velvet value, or "mall" to query the current Mall price',
