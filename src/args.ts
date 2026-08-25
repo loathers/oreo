@@ -66,7 +66,7 @@ export const args = Args.create(
     }),
     calibrationBoards: Args.number({
       help: "Number of deterministic synthetic mines to calibrate against",
-      default: 4000,
+      default: 1000,
     }),
     calibrationSeed: Args.number({
       help: "Synthetic calibration board seed",

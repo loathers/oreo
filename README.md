@@ -110,11 +110,12 @@ goldmine calibrate strategy=ev visibility=low dynamitePrice=mall oreValue=mall
 ```
 
 The default coarse sweep is 500–9000 in steps of 500, followed by six fine
-points around the coarse peak. It generates 4000 boards with seed 12345 and a
-0.496 probability of a second gold. Override these with `calibrationBoards`,
-`calibrationSeed`, and `calibrationSecondGoldChance`; override the sweep with
-`calibrationMin`, `calibrationMax`, `calibrationStep`, and
-`calibrationFineSteps`.
+points around the coarse peak. It generates 1000 boards with seed 12345, which
+has been sufficient for convergence in prior tournaments, and a 0.496
+probability of a second gold. Increase `calibrationBoards` for a deeper run;
+override the generator with `calibrationSeed` and
+`calibrationSecondGoldChance`, or the sweep with `calibrationMin`,
+`calibrationMax`, `calibrationStep`, and `calibrationFineSteps`.
 
 `objectDetectionPrice`, `dynamitePrice`, `oreValue`, `goldValue`, and
 `crystalValue` accept either a number or `mall`. The same resource values are
