@@ -119,9 +119,7 @@ export function buildMiningTasks(
             : []),
         ],
       }),
-      acquire: controller.shouldUseDynamite()
-        ? [{ item: dynamite, optional: true }]
-        : [],
+      acquire: controller.shouldUseDynamite() ? [{ item: dynamite, optional: true }] : [],
       ready: () => selectDecision().action === "mine",
       prepare: () => prepareToMine(),
       do: () => {
