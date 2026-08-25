@@ -10,7 +10,7 @@ and holo-wrist-puter support.
 Run this in the KoLmafia gCLI:
 
 ```text
-git checkout mark-e-duda/goldmine main
+git checkout mark-e-duda/goldmine release
 ```
 
 ## Build
