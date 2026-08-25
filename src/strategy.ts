@@ -17,6 +17,12 @@ export const DEFAULT_VALUES: StrategyValues = {
   crystal: 69,
   cave: 0,
 };
+const MINE_RESULT_IMAGES: Record<string, ResourceType> = {
+  rawvelvet: "ore",
+  goldnugget: "gold",
+  nacrystal1: "crystal",
+  hp: "cave",
+};
 const TARGETS_PER_MINE = 15;
 const ROW_ORE_WEIGHT = [0, 0, 0.1868, 0.4698, 0.6209, 0.67];
 const CLUSTER_ROW_WEIGHT = [0, 0, 0.46, 0.46, 0.46, 1];
@@ -41,6 +47,22 @@ export function coordinateToIndex([column, row]: MiningCoordinate): number {
 
 export function indexToCoordinate(index: number): MiningCoordinate {
   return [colOf(index) + 1, 6 - rowOf(index)];
+}
+
+export function parseMineLayout(
+  layout: string,
+): Array<[coordinate: MiningCoordinate, resource: ResourceType]> {
+  const results: Array<[MiningCoordinate, ResourceType]> = [];
+  const pattern = /#(\d+)<img[^>]*\/(rawvelvet|goldnugget|nacrystal1|hp)\.gif/g;
+  let match: RegExpExecArray | null;
+  while ((match = pattern.exec(layout)) !== null) {
+    const which = Number(match[1]);
+    const coordinate: MiningCoordinate = [which % 8, Math.floor(which / 8)];
+    if (coordinate.every((value) => value >= 1 && value <= 6)) {
+      results.push([coordinate, MINE_RESULT_IMAGES[match[2]]]);
+    }
+  }
+  return results;
 }
 
 function statePositionToIndex(position: number): number {
@@ -194,7 +216,11 @@ export class StrategyController {
     this.fullMineSeen = false;
   }
 
-  update(rawState: string, hasObjectDetection: boolean): void {
+  update(
+    rawState: string,
+    hasObjectDetection: boolean,
+    previouslyMined: Iterable<readonly [MiningCoordinate, ResourceType]> = [],
+  ): void {
     if (rawState.length !== 36) {
       throw new Error(`Expected 36 mine-state cells, received ${rawState.length}`);
     }
@@ -202,6 +228,10 @@ export class StrategyController {
     this.opened = new Set<number>();
     for (let position = 0; position < rawState.length; position++) {
       if (rawState[position] === "o") this.opened.add(statePositionToIndex(position));
+    }
+    for (const [coordinate, resource] of previouslyMined) {
+      const index = coordinateToIndex(coordinate);
+      if (this.opened.has(index)) this.observed.set(index, resource);
     }
 
     const fullVisibility = this.visibility !== "low" && hasObjectDetection;

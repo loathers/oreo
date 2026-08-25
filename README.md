@@ -129,6 +129,8 @@ bundled defaults.
 
 - `survive=true` restores enough HP to survive cave-ins.
 - `explain=true` prints each strategy decision.
+- `useMiningOutfit=false` preserves the current outfit. The current outfit must
+  already provide the required mining equipment and 15 Hot Resistance.
 
 The script does not diet for you. Fill your organs before running it.
 

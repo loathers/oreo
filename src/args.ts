@@ -16,6 +16,10 @@ export const args = Args.create(
       help: "Whether to print explanations for decisions",
       default: false,
     }),
+    useMiningOutfit: Args.boolean({
+      help: "Whether to equip the mining drill, medical kit, and optional wrist-puter",
+      default: true,
+    }),
     strategy: Args.string({
       help: "Mining strategy: pjb, oreo, ev, or ev-cluster",
       default: "ev-cluster",

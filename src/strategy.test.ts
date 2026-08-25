@@ -4,6 +4,7 @@ import {
   coordinateToIndex,
   indexToCoordinate,
   makeCalibrationBoards,
+  parseMineLayout,
   StrategyController,
 } from "./strategy.ts";
 
@@ -21,6 +22,20 @@ for (const board of calibrationBoards) {
 }
 assert.equal([...makeCalibrationBoards(1, 1, 0)[0]].filter((tile) => tile === "g").length, 1);
 assert.equal([...makeCalibrationBoards(1, 1, 1)[0]].filter((tile) => tile === "g").length, 2);
+assert.deepEqual(
+  parseMineLayout(
+    '#50<img src="https://example/itemimages/goldnugget.gif">' +
+      '#51<img src="https://example/itemimages/rawvelvet.gif">' +
+      '#42<img src="https://example/itemimages/nacrystal1.gif">' +
+      '#41<img src="https://example/itemimages/hp.gif">',
+  ),
+  [
+    [[2, 6], "gold"],
+    [[3, 6], "ore"],
+    [[2, 5], "crystal"],
+    [[1, 5], "cave"],
+  ],
+);
 
 function mineState(entries: Array<[position: number, value: string]>): string {
   const state = Array(36).fill(".");
@@ -30,6 +45,26 @@ function mineState(entries: Array<[position: number, value: string]>): string {
 
 assert.deepEqual(indexToCoordinate(coordinateToIndex([1, 6])), [1, 6]);
 assert.deepEqual(indexToCoordinate(coordinateToIndex([6, 1])), [6, 1]);
+
+const resumed = new StrategyController("ev", "high", 1, {
+  ore: 0,
+  gold: 10000,
+  crystal: 0,
+  cave: 0,
+});
+resumed.update(
+  mineState([
+    [30, "o"],
+    [31, "o"],
+    [24, "*"],
+  ]),
+  true,
+  [
+    [[1, 6], "gold"],
+    [[2, 6], "gold"],
+  ],
+);
+assert.equal(resumed.decide().action, "reset");
 
 const pjb = new StrategyController("pjb", "low");
 pjb.update(mineState([[30, "*"]]), false);
