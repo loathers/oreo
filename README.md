@@ -64,8 +64,9 @@ The default is `auto`. High visibility remembers every revealed sparkle for the
 remainder of the current cavern even if the effect expires. Unused effect turns
 naturally carry across cavern resets.
 
-`objectDetectionPrice=120` sets the economic and maximum acquisition price per
-potion. Use `objectDetectionPrice=mall` to query its current Mall price.
+KoLmafia identifies and acquires the ascension-specific bang potion.
+`objectDetectionPrice=mall` (the default) resolves that potion and queries its
+Mall price for EV calibration; normal KoLmafia acquisition limits still apply.
 
 ### Dynamite
 

@@ -29,8 +29,8 @@ export const args = Args.create(
       default: 0,
     }),
     objectDetectionPrice: Args.string({
-      help: 'Potion of detection price, or "mall" to query the current Mall price',
-      default: "120",
+      help: 'Potion of detection price, or "mall" to query the identified potion',
+      default: "mall",
     }),
     dynamitePrice: Args.string({
       help: 'Minin\' dynamite price, or "mall" to query the current Mall price',

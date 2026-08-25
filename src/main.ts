@@ -6,6 +6,7 @@ import {
   myAdventures,
   myInebriety,
   print,
+  toItem,
   totalTurnsPlayed,
 } from "kolmafia";
 import { $item, $location, sinceKolmafiaRevision } from "libram";
@@ -86,7 +87,7 @@ export function main(argstring = "") {
       values,
       dynamitePrice: resolvePrice(args.dynamitePrice, $item`minin' dynamite`),
       objectDetectionPrice: args.visibility === "high"
-        ? resolvePrice(args.objectDetectionPrice, $item`potion of detection`)
+        ? resolvePrice(args.objectDetectionPrice, toItem("potion of detection"))
         : 0,
       min: args.calibrationMin,
       max: args.calibrationMax,
