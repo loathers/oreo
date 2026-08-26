@@ -48,10 +48,11 @@ assert.equal([...makeCalibrationBoards(1, 1, 0)[0]].filter((tile) => tile === "g
 assert.equal([...makeCalibrationBoards(1, 1, 1)[0]].filter((tile) => tile === "g").length, 2);
 assert.deepEqual(
   parseMineLayout(
-    '#50<img src="https://example/itemimages/goldnugget.gif">' +
-      '#51<img src="https://example/itemimages/rawvelvet.gif">' +
-      '#42<img src="https://example/itemimages/nacrystal1.gif">' +
-      '#41<img src="https://example/itemimages/hp.gif">',
+    '#50<img src="https://d2uyhvukfffg5a.cloudfront.net/itemimages/goldnugget.gif" ' +
+      'width=30 height=30 alt="1,970 carat gold" title="1,970 carat gold">' +
+      '#51<img src="https://d2uyhvukfffg5a.cloudfront.net/itemimages/rawvelvet.gif">' +
+      '#42<img src="https://d2uyhvukfffg5a.cloudfront.net/itemimages/nacrystal1.gif">' +
+      '#41<img src="https://d2uyhvukfffg5a.cloudfront.net/itemimages/hp.gif">',
   ),
   [
     [[2, 6], "gold"],
@@ -59,6 +60,13 @@ assert.deepEqual(
     [[2, 5], "crystal"],
     [[1, 5], "cave"],
   ],
+);
+assert.deepEqual(
+  parseMineLayout(
+    '#0<img src="https://d2uyhvukfffg5a.cloudfront.net/itemimages/goldnugget.gif">' +
+      '#50<img src="https://d2uyhvukfffg5a.cloudfront.net/itemimages/unknown.gif">',
+  ),
+  [],
 );
 
 function mineState(entries: Array<[position: number, value: string]>): string {

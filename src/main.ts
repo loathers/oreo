@@ -25,6 +25,116 @@ import {
 } from "./strategy.js";
 import { buildMiningTasks } from "./tasks.js";
 
+function runCalibration(values: StrategyValues): number {
+  if (args.strategy !== "ev" && args.strategy !== "ev-cluster") {
+    abort("Calibration is only available for the ev and ev-cluster strategies.");
+  }
+  if (
+    args.calibrationMin < 0 ||
+    args.calibrationMax <= args.calibrationMin ||
+    args.calibrationStep <= 0 ||
+    args.calibrationFineSteps < 0 ||
+    !Number.isInteger(args.calibrationBoards) ||
+    args.calibrationBoards <= 0 ||
+    !Number.isFinite(args.secondGoldChance) ||
+    args.secondGoldChance < 0 ||
+    args.secondGoldChance > 1
+  ) {
+    abort(
+      "Calibration requires 0 <= min < max, step > 0, fineSteps >= 0, " +
+        "positive integer boards, and 0 <= P(2 gold) <= 1.",
+    );
+  }
+  print(
+    `Calibrating ${args.strategy}/${args.visibility} on ${args.calibrationBoards} synthetic mines...`,
+    "blue",
+  );
+  const dynamitePrice = resolvePrice(args.dynamitePrice, $item`minin' dynamite`);
+  const objectDetectionPrice =
+    args.visibility === "high"
+      ? resolvePrice(args.objectDetectionPrice, toItem("potion of detection"))
+      : 0;
+  const result = calibrate({
+    strategy: args.strategy,
+    visibility: args.visibility as VisibilityMode,
+    values,
+    dynamitePrice,
+    objectDetectionPrice,
+    min: args.calibrationMin,
+    max: args.calibrationMax,
+    step: args.calibrationStep,
+    fineSteps: args.calibrationFineSteps,
+    boardCount: args.calibrationBoards,
+    seed: args.calibrationSeed,
+    secondGoldChance: args.secondGoldChance,
+    onProgress: (completed, total, lambda) =>
+      print(
+        `Calibration ${completed}/${total} (${Math.round((100 * completed) / total)}%): ` +
+          `lambda=${lambda}`,
+        "blue",
+      ),
+  });
+  print(
+    `Calibrated ${args.strategy}/${args.visibility} on ${result.sampleSize} synthetic mines: ` +
+      `lambda=${result.lambda}, rate=${result.rate.toFixed(1)}`,
+    "blue",
+  );
+  print(
+    `Use: goldmine strategy=${args.strategy} visibility=${args.visibility} ` +
+      `lambda=${result.lambda} oreValue=${values.ore} goldValue=${values.gold} ` +
+      `crystalValue=${values.crystal} dynamitePrice=${dynamitePrice} ` +
+      `objectDetectionPrice=${objectDetectionPrice} secondGoldChance=${args.secondGoldChance}`,
+    "blue",
+  );
+  return result.lambda;
+}
+
+function runMining(values: StrategyValues, lambda: number): void {
+  const stopAtTurn = totalTurnsPlayed() + args.turns;
+
+  if (!get("hotAirportAlways") && !get("_hotAirportToday")) {
+    abort("You do not have access to That 70s Volcano.");
+  }
+
+  // Make sure the mine state is up to date
+  visit(Mine.VOLCANO);
+  if (getState(Mine.VOLCANO).length !== 36) {
+    abort("Could not access the Velvet / Gold Mine.");
+  }
+
+  const accounting: MiningAccounting = {
+    values: new Map([
+      [$item`unsmoothed velvet`, values.ore],
+      [$item`1,970 carat gold`, values.gold],
+      [$item`New Age healing crystal`, values.crystal],
+    ]),
+    costs: new Map(),
+    used: new Map(),
+  };
+  const quest: Quest<Task> = {
+    name: "Goldmine",
+    ready: () => myInebriety() <= inebrietyLimit() && (myAdventures() > 0 || countFreeMines() > 0),
+    completed: () => totalTurnsPlayed() >= stopAtTurn && countFreeMines() === 0,
+    tasks: buildMiningTasks(
+      new StrategyController(
+        args.strategy as StrategyName,
+        args.visibility as VisibilityMode,
+        lambda,
+        values,
+        args.secondGoldChance,
+      ),
+      accounting,
+    ),
+  };
+
+  const engine = new MiningEngine(getTasks([quest]), accounting);
+  try {
+    engine.run();
+  } finally {
+    engine.destruct();
+  }
+}
+
 export function main(argstring = "") {
   sinceKolmafiaRevision(28420);
 
@@ -65,113 +175,9 @@ export function main(argstring = "") {
   };
   let lambda = args.lambda;
   if (calibrationOnly || args.calibrate) {
-    if (args.strategy !== "ev" && args.strategy !== "ev-cluster") {
-      abort("Calibration is only available for the ev and ev-cluster strategies.");
-    }
-    if (
-      args.calibrationMin < 0 ||
-      args.calibrationMax <= args.calibrationMin ||
-      args.calibrationStep <= 0 ||
-      args.calibrationFineSteps < 0 ||
-      !Number.isInteger(args.calibrationBoards) ||
-      args.calibrationBoards <= 0 ||
-      !Number.isFinite(args.secondGoldChance) ||
-      args.secondGoldChance < 0 ||
-      args.secondGoldChance > 1
-    ) {
-      abort(
-        "Calibration requires 0 <= min < max, step > 0, fineSteps >= 0, " +
-          "positive integer boards, and 0 <= P(2 gold) <= 1.",
-      );
-    }
-    print(
-      `Calibrating ${args.strategy}/${args.visibility} on ${args.calibrationBoards} synthetic mines...`,
-      "blue",
-    );
-    const dynamitePrice = resolvePrice(args.dynamitePrice, $item`minin' dynamite`);
-    const objectDetectionPrice =
-      args.visibility === "high"
-        ? resolvePrice(args.objectDetectionPrice, toItem("potion of detection"))
-        : 0;
-    const result = calibrate({
-      strategy: args.strategy,
-      visibility: args.visibility as VisibilityMode,
-      values,
-      dynamitePrice,
-      objectDetectionPrice,
-      min: args.calibrationMin,
-      max: args.calibrationMax,
-      step: args.calibrationStep,
-      fineSteps: args.calibrationFineSteps,
-      boardCount: args.calibrationBoards,
-      seed: args.calibrationSeed,
-      secondGoldChance: args.secondGoldChance,
-      onProgress: (completed, total, lambda) =>
-        print(
-          `Calibration ${completed}/${total} (${Math.round((100 * completed) / total)}%): ` +
-            `lambda=${lambda}`,
-          "blue",
-        ),
-    });
-    print(
-      `Calibrated ${args.strategy}/${args.visibility} on ${result.sampleSize} synthetic mines: ` +
-        `lambda=${result.lambda}, rate=${result.rate.toFixed(1)}`,
-      "blue",
-    );
-    print(
-      `Use: goldmine strategy=${args.strategy} visibility=${args.visibility} ` +
-        `lambda=${result.lambda} oreValue=${values.ore} goldValue=${values.gold} ` +
-        `crystalValue=${values.crystal} dynamitePrice=${dynamitePrice} ` +
-        `objectDetectionPrice=${objectDetectionPrice} secondGoldChance=${args.secondGoldChance}`,
-      "blue",
-    );
+    lambda = runCalibration(values);
     if (calibrationOnly) return;
-    lambda = result.lambda;
     print(`Continuing with calibrated lambda=${lambda}.`, "blue");
   }
-
-  const stopAtTurn = totalTurnsPlayed() + args.turns;
-
-  if (!get("hotAirportAlways") && !get("_hotAirportToday")) {
-    abort("You do not have access to That 70s Volcano.");
-  }
-
-  // Make sure the mine state is up to date
-  visit(Mine.VOLCANO);
-  if (getState(Mine.VOLCANO).length !== 36) {
-    abort("Could not access the Velvet / Gold Mine.");
-  }
-
-  const accounting: MiningAccounting = {
-    values: new Map([
-      [$item`unsmoothed velvet`, values.ore],
-      [$item`1,970 carat gold`, values.gold],
-      [$item`New Age healing crystal`, values.crystal],
-    ]),
-    costs: new Map(),
-    used: new Map(),
-  };
-  const quest: Quest<Task> = {
-    name: "Goldmine",
-    ready: () => myInebriety() <= inebrietyLimit() && (myAdventures() > 0 || countFreeMines() > 0),
-    completed: () => totalTurnsPlayed() >= stopAtTurn && countFreeMines() === 0,
-    tasks: buildMiningTasks(
-      new StrategyController(
-        args.strategy as StrategyName,
-        args.visibility as VisibilityMode,
-        lambda,
-        values,
-        args.secondGoldChance,
-      ),
-      accounting,
-    ),
-  };
-
-  const engine = new MiningEngine(getTasks([quest]), accounting);
-
-  try {
-    engine.run();
-  } finally {
-    engine.destruct();
-  }
+  runMining(values, lambda);
 }
