@@ -107,6 +107,7 @@ generator:
 ```text
 goldmine calibrate strategy=ev-cluster visibility=high
 goldmine calibrate strategy=ev visibility=low dynamitePrice=mall oreValue=mall
+goldmine 100 strategy=ev visibility=high calibrate=true
 ```
 
 The default coarse sweep is 500–9000 in steps of 500, followed by six fine
@@ -117,6 +118,9 @@ override the generator with `calibrationSeed` and
 `secondGoldChance`, or the sweep with `calibrationMin`,
 `calibrationMax`, `calibrationStep`, and `calibrationFineSteps`.
 The same second-gold probability is used by live EV decisions.
+Set `calibrate=true` on a normal mining command to calibrate first and then
+continue mining with the resulting λ. The standalone `calibrate` subcommand
+still prints the equivalent copy-pasteable command and exits.
 
 `objectDetectionPrice`, `dynamitePrice`, `oreValue`, `goldValue`, and
 `crystalValue` accept either a number or `mall`. The same resource values are

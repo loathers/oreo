@@ -32,6 +32,10 @@ export const args = Args.create(
       help: "EV opportunity cost per turn; 0 uses the calibrated strategy default",
       default: 0,
     }),
+    calibrate: Args.boolean({
+      help: "Calibrate lambda before mining",
+      default: false,
+    }),
     objectDetectionPrice: Args.string({
       help: 'Potion of detection price, or "mall" to query the identified potion',
       default: "mall",

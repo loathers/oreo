@@ -29,8 +29,8 @@ export function main(argstring = "") {
   sinceKolmafiaRevision(28420);
 
   const [command, ...rest] = argstring.trim().split(/\s+/);
-  const calibrating = command.toLowerCase() === "calibrate";
-  Args.fill(args, calibrating ? rest.join(" ") : argstring);
+  const calibrationOnly = command.toLowerCase() === "calibrate";
+  Args.fill(args, calibrationOnly ? rest.join(" ") : argstring);
 
   if (args.help) {
     Args.showHelp(args);
@@ -63,7 +63,8 @@ export function main(argstring = "") {
     crystal: resolvePrice(args.crystalValue, $item`New Age healing crystal`),
     cave: 0,
   };
-  if (calibrating) {
+  let lambda = args.lambda;
+  if (calibrationOnly || args.calibrate) {
     if (args.strategy !== "ev" && args.strategy !== "ev-cluster") {
       abort("Calibration is only available for the ev and ev-cluster strategies.");
     }
@@ -124,7 +125,9 @@ export function main(argstring = "") {
         `objectDetectionPrice=${objectDetectionPrice} secondGoldChance=${args.secondGoldChance}`,
       "blue",
     );
-    return;
+    if (calibrationOnly) return;
+    lambda = result.lambda;
+    print(`Continuing with calibrated lambda=${lambda}.`, "blue");
   }
 
   const stopAtTurn = totalTurnsPlayed() + args.turns;
@@ -156,7 +159,7 @@ export function main(argstring = "") {
       new StrategyController(
         args.strategy as StrategyName,
         args.visibility as VisibilityMode,
-        args.lambda,
+        lambda,
         values,
         args.secondGoldChance,
       ),
