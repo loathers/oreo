@@ -1,11 +1,9 @@
 import { abort, equippedAmount, itemAmount, toItem, use } from "kolmafia";
-import { $effect, $item, ensureEffect, get, have } from "libram";
+import { $effect, $item, ensureEffect, get, have, Mining } from "libram";
 
 import { args } from "./args.js";
 import { type MiningAccounting, recordItemUse, Task } from "./engine.js";
 import { parseMineLayout } from "./mine-layout.js";
-import * as Mining from "./mining.js";
-import { Mine } from "./mining.js";
 import { resolvePrice } from "./pricing.js";
 import { type Decision, type ResourceType, StrategyController } from "./strategy.js";
 import { assureHotResistance, explain, mineCoordinate, prepareToMine } from "./utils.js";
@@ -43,8 +41,8 @@ export function buildMiningTasks(
   const selectDecision = () => {
     if (pendingDecision) return pendingDecision;
     controller.update(
-      Mining.getState(Mine.VOLCANO),
-      Mining.hasObjectDetection(Mine.VOLCANO),
+      Mining.getState(Mining.Mine.VOLCANO),
+      Mining.hasObjectDetection(Mining.Mine.VOLCANO),
       parseMineLayout(get("mineLayout6")),
     );
     pendingDecision = controller.decide();
@@ -53,7 +51,7 @@ export function buildMiningTasks(
 
   const resetCavern = () => {
     if (pendingDecision) explain(pendingDecision.reason);
-    Mining.findNewCavern(Mine.VOLCANO);
+    Mining.findNewCavern(Mining.Mine.VOLCANO);
     controller.reset();
     pendingDecision = null;
   };
@@ -96,7 +94,7 @@ export function buildMiningTasks(
       name: "Maintain Object Detection",
       after: ["Acquire mining drill"],
       noCombat: true,
-      ready: () => args.visibility === "high" && !Mining.hasObjectDetection(Mine.VOLCANO),
+      ready: () => args.visibility === "high" && !Mining.hasObjectDetection(Mining.Mine.VOLCANO),
       do: () => {
         ensureEffect($effect`Object Detection`);
         if (detectionPotion) recordItemUse(accounting, detectionPotion);

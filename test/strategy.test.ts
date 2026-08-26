@@ -1,14 +1,14 @@
 import assert from "node:assert/strict";
 
-import { calculateMiningValue } from "./accounting.ts";
-import { parseMineLayout } from "./mine-layout.ts";
+import { calculateMiningValue } from "../src/accounting.ts";
+import { parseMineLayout } from "../src/mine-layout.ts";
 import {
   coordinateToIndex,
   indexToCoordinate,
   makeCalibrationBoards,
   minimumCostPaths,
   StrategyController,
-} from "./strategy.ts";
+} from "../src/strategy.ts";
 
 const calibrationBoards = makeCalibrationBoards(10, 12345, 0.496);
 assert.deepEqual(

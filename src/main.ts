@@ -8,12 +8,11 @@ import {
   toItem,
   totalTurnsPlayed,
 } from "kolmafia";
-import { $item, get, sinceKolmafiaRevision } from "libram";
+import { $item, get, Mining, sinceKolmafiaRevision } from "libram";
 
 import { args, parsePrice } from "./args.js";
 import { calibrate } from "./calibrate.js";
 import { type MiningAccounting, MiningEngine, Task } from "./engine.js";
-import { countFreeMines, getState, Mine, visit } from "./mining.js";
 import { resolvePrice } from "./pricing.js";
 import {
   STRATEGIES,
@@ -97,8 +96,8 @@ function runMining(values: StrategyValues, lambda: number): void {
   }
 
   // Make sure the mine state is up to date
-  visit(Mine.VOLCANO);
-  if (getState(Mine.VOLCANO).length !== 36) {
+  Mining.visit(Mining.Mine.VOLCANO);
+  if (Mining.getState(Mining.Mine.VOLCANO).length !== 36) {
     abort("Could not access the Velvet / Gold Mine.");
   }
 
@@ -113,8 +112,9 @@ function runMining(values: StrategyValues, lambda: number): void {
   };
   const quest: Quest<Task> = {
     name: "Goldmine",
-    ready: () => myInebriety() <= inebrietyLimit() && (myAdventures() > 0 || countFreeMines() > 0),
-    completed: () => totalTurnsPlayed() >= stopAtTurn && countFreeMines() === 0,
+    ready: () =>
+      myInebriety() <= inebrietyLimit() && (myAdventures() > 0 || Mining.countFreeMines() > 0),
+    completed: () => totalTurnsPlayed() >= stopAtTurn && Mining.countFreeMines() === 0,
     tasks: buildMiningTasks(
       new StrategyController(
         args.strategy as StrategyName,

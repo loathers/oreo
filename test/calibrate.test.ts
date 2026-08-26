@@ -10,7 +10,7 @@ registerHooks({
   },
 });
 
-const { calibrate } = await import("./calibrate.ts");
+const { calibrate } = await import("../src/calibrate.ts");
 const options = {
   strategy: "ev" as const,
   visibility: "low" as const,
