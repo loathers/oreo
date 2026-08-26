@@ -2,11 +2,11 @@ import {
   coordinateToIndex,
   isLegal,
   makeCalibrationBoards,
-  ResourceType,
+  type ResourceType,
   StrategyController,
-  StrategyName,
-  StrategyValues,
-  VisibilityMode,
+  type StrategyName,
+  type StrategyValues,
+  type VisibilityMode,
 } from "./strategy.js";
 
 const TYPE: Record<string, ResourceType | null> = {
@@ -38,6 +38,7 @@ function evaluate(
   dynamitePrice: number,
   objectDetectionPrice: number,
   boards: string[],
+  secondGoldChance: number,
 ): number {
   const fullVisibility = visibility === "high";
   let effectTurns = 0;
@@ -49,7 +50,13 @@ function evaluate(
       totalValue -= objectDetectionPrice;
       effectTurns = 10;
     }
-    const controller = new StrategyController(strategy, visibility, lambda, values);
+    const controller = new StrategyController(
+      strategy,
+      visibility,
+      lambda,
+      values,
+      secondGoldChance,
+    );
     controller.setDynamitePrice(dynamitePrice);
     const opened = new Set<number>();
 
@@ -72,7 +79,7 @@ function evaluate(
       controller.recordMine(decision.coordinate, resource === "cave" ? null : resource);
     }
   }
-  return totalValue / totalTurns;
+  return totalTurns > 0 ? totalValue / totalTurns : Number.NEGATIVE_INFINITY;
 }
 
 export type CalibrationOptions = {
@@ -117,6 +124,7 @@ export function calibrate(options: CalibrationOptions) {
     !Number.isInteger(boardCount) ||
     boardCount <= 0 ||
     !Number.isFinite(seed) ||
+    !Number.isFinite(secondGoldChance) ||
     secondGoldChance < 0 ||
     secondGoldChance > 1
   ) {
@@ -144,16 +152,17 @@ export function calibrate(options: CalibrationOptions) {
       dynamitePrice,
       objectDetectionPrice,
       boards,
+      secondGoldChance,
     );
     rates.set(lambda, result);
     return result;
   };
-  const total = coarse.length + fineSteps;
+  const provisionalTotal = coarse.length + fineSteps;
   let completed = 0;
   let best = coarse[0];
   for (const lambda of coarse) {
     if (rate(lambda) > rate(best)) best = lambda;
-    onProgress?.(++completed, total, lambda);
+    onProgress?.(++completed, provisionalTotal, lambda);
   }
   const bestIndex = coarse.indexOf(best);
   const low = coarse[Math.max(0, bestIndex - 1)];
@@ -161,7 +170,11 @@ export function calibrate(options: CalibrationOptions) {
   for (let point = 1; point <= fineSteps; point++) {
     const lambda = Math.round(low + ((high - low) * point) / (fineSteps + 1));
     if (rate(lambda) > rate(best)) best = lambda;
-    onProgress?.(++completed, total, lambda);
+    onProgress?.(++completed, provisionalTotal, lambda);
   }
-  return { lambda: best, rate: rate(best), sampleSize: boards.length };
+  const bestRate = rate(best);
+  if (!Number.isFinite(bestRate)) {
+    throw new Error("Calibration produced no adventure-spending mining decisions.");
+  }
+  return { lambda: best, rate: bestRate, sampleSize: boards.length };
 }

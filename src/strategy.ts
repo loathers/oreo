@@ -17,12 +17,6 @@ export const DEFAULT_VALUES: StrategyValues = {
   crystal: 69,
   cave: 0,
 };
-const MINE_RESULT_IMAGES: Record<string, ResourceType> = {
-  rawvelvet: "ore",
-  goldnugget: "gold",
-  nacrystal1: "crystal",
-  hp: "cave",
-};
 const TARGETS_PER_MINE = 15;
 const ROW_ORE_WEIGHT = [0, 0, 0.1868, 0.4698, 0.6209, 0.67];
 const CLUSTER_ROW_WEIGHT = [0, 0, 0.46, 0.46, 0.46, 1];
@@ -49,22 +43,6 @@ export function indexToCoordinate(index: number): MiningCoordinate {
   return [colOf(index) + 1, 6 - rowOf(index)];
 }
 
-export function parseMineLayout(
-  layout: string,
-): Array<[coordinate: MiningCoordinate, resource: ResourceType]> {
-  const results: Array<[MiningCoordinate, ResourceType]> = [];
-  const pattern = /#(\d+)<img[^>]*\/(rawvelvet|goldnugget|nacrystal1|hp)\.gif/g;
-  let match: RegExpExecArray | null;
-  while ((match = pattern.exec(layout)) !== null) {
-    const which = Number(match[1]);
-    const coordinate: MiningCoordinate = [which % 8, Math.floor(which / 8)];
-    if (coordinate.every((value) => value >= 1 && value <= 6)) {
-      results.push([coordinate, MINE_RESULT_IMAGES[match[2]]]);
-    }
-  }
-  return results;
-}
-
 function statePositionToIndex(position: number): number {
   const gameRow = Math.floor(position / 6);
   return (5 - gameRow) * 6 + (position % 6);
@@ -75,6 +53,53 @@ export function isLegal(index: number, opened: Set<number>): boolean {
     !opened.has(index) &&
     (rowOf(index) === 0 || neighbors[index].some((neighbor) => opened.has(neighbor)))
   );
+}
+
+export function minimumCostPaths(
+  opened: ReadonlySet<number>,
+  starts: Iterable<number>,
+  tileCost: (index: number) => number,
+): Map<number, { cost: number; path: number[] }> {
+  const distances = Array(36).fill(Infinity) as number[];
+  const parents = Array(36).fill(-1) as number[];
+  const visited = new Set<number>();
+
+  for (const start of [...starts].sort((a, b) => a - b)) {
+    if (!opened.has(start)) distances[start] = tileCost(start);
+  }
+
+  for (let step = 0; step < 36; step++) {
+    let current = -1;
+    for (let index = 0; index < 36; index++) {
+      if (!visited.has(index) && (current < 0 || distances[index] < distances[current])) {
+        current = index;
+      }
+    }
+    if (current < 0 || !Number.isFinite(distances[current])) break;
+    visited.add(current);
+
+    for (const neighbor of neighbors[current]) {
+      if (opened.has(neighbor) || visited.has(neighbor)) continue;
+      const candidate = distances[current] + tileCost(neighbor);
+      if (
+        candidate < distances[neighbor] ||
+        (candidate === distances[neighbor] &&
+          (parents[neighbor] < 0 || current < parents[neighbor]))
+      ) {
+        distances[neighbor] = candidate;
+        parents[neighbor] = current;
+      }
+    }
+  }
+
+  const paths = new Map<number, { cost: number; path: number[] }>();
+  for (let target = 0; target < 36; target++) {
+    if (!Number.isFinite(distances[target])) continue;
+    const path: number[] = [];
+    for (let node = target; node >= 0; node = parents[node]) path.unshift(node);
+    paths.set(target, { cost: distances[target], path });
+  }
+  return paths;
 }
 
 type Cluster = { tiles: number[]; weight: number };
@@ -194,17 +219,23 @@ export class StrategyController {
   readonly visibility: VisibilityMode;
   readonly lambdaOverride: number;
   readonly values: StrategyValues;
+  readonly secondGoldChance: number;
 
   constructor(
     strategy: StrategyName,
     visibility: VisibilityMode,
     lambdaOverride = 0,
     values: StrategyValues = DEFAULT_VALUES,
+    secondGoldChance = 0.496,
   ) {
+    if (!Number.isFinite(secondGoldChance) || secondGoldChance < 0 || secondGoldChance > 1) {
+      throw new Error("Second-gold chance must be between zero and one.");
+    }
     this.strategy = strategy;
     this.visibility = visibility;
     this.lambdaOverride = lambdaOverride;
     this.values = values;
+    this.secondGoldChance = secondGoldChance;
   }
 
   reset(): void {
@@ -353,19 +384,16 @@ export class StrategyController {
 
     let best: { path: number[]; score: number; reward: number } | null = null;
     const lambda = this.turnValue();
-    for (const target of this.knownSparkles) {
-      const path = this.shortestPath(starts, target);
-      if (!path) continue;
+    const paths = minimumCostPaths(this.opened, starts, (index) =>
+      this.knownDull.has(index) && this.shouldUseDynamite() ? this.dynamitePrice : lambda,
+    );
+    for (const target of [...this.knownSparkles].sort((a, b) => a - b)) {
+      const route = paths.get(target);
+      if (!route) continue;
       const reward = ev[target];
-      const routeCost = path.reduce(
-        (cost, index) =>
-          cost +
-          (this.knownDull.has(index) && this.shouldUseDynamite() ? this.dynamitePrice : lambda),
-        0,
-      );
-      const score = reward - routeCost;
-      if (!best || score > best.score || (score === best.score && reward > best.reward)) {
-        best = { path, score, reward };
+      const score = reward - route.cost;
+      if (!best || score > best.score) {
+        best = { path: route.path, score, reward };
       }
     }
 
@@ -415,7 +443,7 @@ export class StrategyController {
     }
     const oreRemaining = Math.max(0, 6 - ore);
     const crystalRemaining = Math.max(0, 3 - crystal);
-    const goldRemaining = Math.max(0, 1.496 - gold);
+    const goldRemaining = Math.max(0, 1 + this.secondGoldChance - gold);
     return {
       oreRemaining,
       crystalRemaining,
@@ -498,28 +526,5 @@ export class StrategyController {
     const pGold = nonOreTotal > 0 ? (pNonOre * counts.goldRemaining) / nonOreTotal : 0;
     const pCrystal = nonOreTotal > 0 ? (pNonOre * counts.crystalRemaining) / nonOreTotal : 0;
     return pOre * this.values.ore + pGold * this.values.gold + pCrystal * this.values.crystal;
-  }
-
-  private shortestPath(starts: Set<number>, target: number): number[] | null {
-    const queue = [...starts];
-    const parent = new Map<number, number | null>();
-    for (const start of starts) parent.set(start, null);
-
-    for (let cursor = 0; cursor < queue.length; cursor++) {
-      const current = queue[cursor];
-      if (current === target) {
-        const path: number[] = [];
-        for (let node: number | null = current; node !== null; node = parent.get(node) ?? null) {
-          path.unshift(node);
-        }
-        return path;
-      }
-      for (const neighbor of neighbors[current]) {
-        if (this.opened.has(neighbor) || parent.has(neighbor)) continue;
-        parent.set(neighbor, current);
-        queue.push(neighbor);
-      }
-    }
-    return null;
   }
 }

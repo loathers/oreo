@@ -3,15 +3,11 @@ import { $effect, $item, ensureEffect, get, have } from "libram";
 
 import { args } from "./args.js";
 import { type MiningAccounting, recordItemUse, Task } from "./engine.js";
+import { parseMineLayout } from "./mine-layout.js";
 import * as Mining from "./mining.js";
 import { Mine } from "./mining.js";
 import { resolvePrice } from "./pricing.js";
-import {
-  type Decision,
-  parseMineLayout,
-  type ResourceType,
-  StrategyController,
-} from "./strategy.js";
+import { type Decision, type ResourceType, StrategyController } from "./strategy.js";
 import { assureHotResistance, explain, mineCoordinate, prepareToMine } from "./utils.js";
 
 const gold = $item`1,970 carat gold`;
@@ -45,6 +41,7 @@ export function buildMiningTasks(
   let pendingDecision: Decision | null = null;
 
   const selectDecision = () => {
+    if (pendingDecision) return pendingDecision;
     controller.update(
       Mining.getState(Mine.VOLCANO),
       Mining.hasObjectDetection(Mine.VOLCANO),
@@ -131,7 +128,7 @@ export function buildMiningTasks(
             ],
           })
         : undefined,
-      acquire: controller.shouldUseDynamite() ? [{ item: dynamite, optional: true }] : [],
+      acquire: () => (controller.shouldUseDynamite() ? [{ item: dynamite, optional: true }] : []),
       ready: () => selectDecision().action === "mine",
       prepare: () => {
         if (!args.useMiningOutfit && equippedAmount($item`high-temperature mining drill`) === 0) {

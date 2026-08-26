@@ -74,8 +74,9 @@ export function main(argstring = "") {
       args.calibrationFineSteps < 0 ||
       !Number.isInteger(args.calibrationBoards) ||
       args.calibrationBoards <= 0 ||
-      args.calibrationSecondGoldChance < 0 ||
-      args.calibrationSecondGoldChance > 1
+      !Number.isFinite(args.secondGoldChance) ||
+      args.secondGoldChance < 0 ||
+      args.secondGoldChance > 1
     ) {
       abort(
         "Calibration requires 0 <= min < max, step > 0, fineSteps >= 0, " +
@@ -103,7 +104,7 @@ export function main(argstring = "") {
       fineSteps: args.calibrationFineSteps,
       boardCount: args.calibrationBoards,
       seed: args.calibrationSeed,
-      secondGoldChance: args.calibrationSecondGoldChance,
+      secondGoldChance: args.secondGoldChance,
       onProgress: (completed, total, lambda) =>
         print(
           `Calibration ${completed}/${total} (${Math.round((100 * completed) / total)}%): ` +
@@ -120,7 +121,7 @@ export function main(argstring = "") {
       `Use: goldmine strategy=${args.strategy} visibility=${args.visibility} ` +
         `lambda=${result.lambda} oreValue=${values.ore} goldValue=${values.gold} ` +
         `crystalValue=${values.crystal} dynamitePrice=${dynamitePrice} ` +
-        `objectDetectionPrice=${objectDetectionPrice}`,
+        `objectDetectionPrice=${objectDetectionPrice} secondGoldChance=${args.secondGoldChance}`,
       "blue",
     );
     return;
@@ -157,6 +158,7 @@ export function main(argstring = "") {
         args.visibility as VisibilityMode,
         args.lambda,
         values,
+        args.secondGoldChance,
       ),
       accounting,
     ),

@@ -1,14 +1,38 @@
 import assert from "node:assert/strict";
 
+import { calculateMiningValue } from "./accounting.ts";
+import { parseMineLayout } from "./mine-layout.ts";
 import {
   coordinateToIndex,
   indexToCoordinate,
   makeCalibrationBoards,
-  parseMineLayout,
+  minimumCostPaths,
   StrategyController,
 } from "./strategy.ts";
 
 const calibrationBoards = makeCalibrationBoards(10, 12345, 0.496);
+assert.deepEqual(
+  calculateMiningValue<string>(
+    [["gold", 2]],
+    [
+      ["dynamite", 3],
+      ["potion", 1],
+    ],
+    new Map([["gold", 21000]]),
+    new Map([
+      ["dynamite", 5000],
+      ["potion", 120],
+    ]),
+    10,
+  ),
+  {
+    grossValue: 42000,
+    consumableCost: 15120,
+    netValue: 26880,
+    valuePerAdventure: 2688,
+  },
+);
+assert.equal(calculateMiningValue([], [], new Map(), new Map(), 0).valuePerAdventure, null);
 assert.equal(calibrationBoards.length, 10);
 assert.equal(
   calibrationBoards.every((board) => board.length === 36),
@@ -45,6 +69,12 @@ function mineState(entries: Array<[position: number, value: string]>): string {
 
 assert.deepEqual(indexToCoordinate(coordinateToIndex([1, 6])), [1, 6]);
 assert.deepEqual(indexToCoordinate(coordinateToIndex([6, 1])), [6, 1]);
+assert.deepEqual(
+  minimumCostPaths(new Set(), [0], (index) =>
+    [0, 6, 7, 8].includes(index) ? 1 : [1, 2].includes(index) ? 10 : 100,
+  ).get(2),
+  { cost: 14, path: [0, 6, 7, 8, 2] },
+);
 
 const resumed = new StrategyController("ev", "high", 1, {
   ore: 0,
@@ -65,6 +95,30 @@ resumed.update(
   ],
 );
 assert.equal(resumed.decide().action, "reset");
+
+const oneGoldState = mineState([
+  [30, "o"],
+  [24, "*"],
+]);
+const exhaustedGold = new StrategyController(
+  "ev",
+  "high",
+  1,
+  { ore: 0, gold: 10000, crystal: 0, cave: 0 },
+  0,
+);
+exhaustedGold.update(oneGoldState, true, [[[1, 6], "gold"]]);
+assert.equal(exhaustedGold.decide().action, "reset");
+const remainingGold = new StrategyController(
+  "ev",
+  "high",
+  1,
+  { ore: 0, gold: 10000, crystal: 0, cave: 0 },
+  1,
+);
+remainingGold.update(oneGoldState, true, [[[1, 6], "gold"]]);
+assert.equal(remainingGold.decide().action, "mine");
+assert.throws(() => new StrategyController("ev", "low", 0, undefined, 1.01));
 
 const pjb = new StrategyController("pjb", "low");
 pjb.update(mineState([[30, "*"]]), false);

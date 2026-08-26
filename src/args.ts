@@ -76,8 +76,8 @@ export const args = Args.create(
       help: "Synthetic calibration board seed",
       default: 12345,
     }),
-    calibrationSecondGoldChance: Args.number({
-      help: "Probability that a generated mine contains a second gold",
+    secondGoldChance: Args.number({
+      help: "Assumed probability that a mine contains a second gold",
       default: 0.496,
     }),
   },
@@ -88,6 +88,7 @@ export const args = Args.create(
 
 export function parsePrice(value: string): number | "mall" | null {
   const normalized = value.trim().toLowerCase();
+  if (normalized === "") return null;
   if (normalized === "mall") return "mall";
   const price = Number(normalized);
   return Number.isFinite(price) && price >= 0 ? price : null;

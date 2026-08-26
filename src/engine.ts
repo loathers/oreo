@@ -2,6 +2,7 @@ import { Task as BaseTask, CombatResources, CombatStrategy, Engine } from "grimo
 import { type Item } from "kolmafia";
 import { Session } from "libram";
 
+import { calculateMiningValue } from "./accounting.js";
 import { printHighlight } from "./utils.js";
 
 export interface Task extends BaseTask {
@@ -41,32 +42,34 @@ export class MiningEngine extends Engine<never, Task> {
     const collected = [...diff.items].filter(
       ([item, quantity]) => quantity > 0 && !this.accounting.costs.has(item),
     );
-    let grossValue = 0;
     printHighlight(`goldmine has run ${diff.totalTurns} turns.`);
     printHighlight("Items collected:");
     for (const [item, quantity] of collected) {
       const value = (this.accounting.values.get(item) ?? 0) * quantity;
-      grossValue += value;
       printHighlight(` ${item}: ${quantity}${value > 0 ? ` (${value} Meat)` : ""}`);
     }
     if (collected.length === 0) printHighlight(" none");
 
-    let consumableCost = 0;
     printHighlight("Items used:");
     for (const [item, quantity] of this.accounting.used) {
       const cost = (this.accounting.costs.get(item) ?? 0) * quantity;
-      consumableCost += cost;
       printHighlight(` ${item}: ${quantity} (${cost} Meat)`);
     }
     if (this.accounting.used.size === 0) printHighlight(" none");
 
-    printHighlight(`Gross collected value: ${grossValue} Meat`);
-    printHighlight(`Consumable cost: ${consumableCost} Meat`);
-    const netValue = grossValue - consumableCost;
-    printHighlight(`Total value achieved: ${netValue} Meat`);
+    const summary = calculateMiningValue(
+      collected,
+      this.accounting.used,
+      this.accounting.values,
+      this.accounting.costs,
+      diff.totalTurns,
+    );
+    printHighlight(`Gross collected value: ${summary.grossValue} Meat`);
+    printHighlight(`Consumable cost: ${summary.consumableCost} Meat`);
+    printHighlight(`Total value achieved: ${summary.netValue} Meat`);
     printHighlight(
-      diff.totalTurns > 0
-        ? `Session value: ${(netValue / diff.totalTurns).toFixed(1)} Meat/Adventure`
+      summary.valuePerAdventure !== null
+        ? `Session value: ${summary.valuePerAdventure.toFixed(1)} Meat/Adventure`
         : "Session value: N/A (no adventures spent)",
     );
   }

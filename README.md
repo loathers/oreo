@@ -114,8 +114,9 @@ points around the coarse peak. It generates 1000 boards with seed 12345, which
 has been sufficient for convergence in prior tournaments, and a 0.496
 probability of a second gold. Increase `calibrationBoards` for a deeper run;
 override the generator with `calibrationSeed` and
-`calibrationSecondGoldChance`, or the sweep with `calibrationMin`,
+`secondGoldChance`, or the sweep with `calibrationMin`,
 `calibrationMax`, `calibrationStep`, and `calibrationFineSteps`.
+The same second-gold probability is used by live EV decisions.
 
 `objectDetectionPrice`, `dynamitePrice`, `oreValue`, `goldValue`, and
 `crystalValue` accept either a number or `mall`. The same resource values are
