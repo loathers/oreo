@@ -142,5 +142,5 @@ The script does not diet for you. Fill your organs before running it.
 ## FAQS
 
 - One important alert for all interested users:
-:warning: **<span style="color:red">OREO WILL NOT DIET FOR YOU; IT WILL JUST USE ADVENTURES. FILL YOUR ORGANS!</span>** :warning:
+  :warning: **<span style="color:red">OREO WILL NOT DIET FOR YOU; IT WILL JUST USE ADVENTURES. FILL YOUR ORGANS!</span>** :warning:
 - The script is pronounced ore-o, because it helps you mine ore.
