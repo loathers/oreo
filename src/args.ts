@@ -1,7 +1,7 @@
 import { Args } from "grimoire-kolmafia";
 
 export const args = Args.create(
-  "goldmine",
+  "oreo",
   "Selectable strategies for the Velvet / Gold Mine",
   {
     turns: Args.number({
@@ -57,15 +57,15 @@ export const args = Args.create(
       default: "69",
     }),
     calibrationMin: Args.number({
-      help: "Minimum lambda for `goldmine calibrate`",
+      help: "Minimum lambda for `oreo calibrate`",
       default: 500,
     }),
     calibrationMax: Args.number({
-      help: "Maximum lambda for `goldmine calibrate`",
+      help: "Maximum lambda for `oreo calibrate`",
       default: 9000,
     }),
     calibrationStep: Args.number({
-      help: "Coarse lambda step for `goldmine calibrate`",
+      help: "Coarse lambda step for `oreo calibrate`",
       default: 500,
     }),
     calibrationFineSteps: Args.number({

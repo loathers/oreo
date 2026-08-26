@@ -8,10 +8,10 @@ on:
   workflow_dispatch:
 
 env:
-  node-version: "24"
+  node-version: "22"
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   test:
@@ -29,10 +29,11 @@ jobs:
       - name: Install Dependencies
         run: yarn install --immutable
 
+      - name: Test
+        run: yarn run test
+
       - name: Build
-        run: |
-          yarn run test
-          yarn run build
+        run: yarn run build
 
   lint:
     runs-on: ubuntu-latest
@@ -56,6 +57,8 @@ jobs:
     runs-on: ubuntu-latest
     needs: [test, lint]
     if: github.ref == 'refs/heads/main'
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v4
 

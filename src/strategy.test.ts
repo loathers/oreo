@@ -32,7 +32,15 @@ assert.deepEqual(
     valuePerAdventure: 2688,
   },
 );
-assert.equal(calculateMiningValue([], [], new Map(), new Map(), 0).valuePerAdventure, null);
+assert.deepEqual(
+  calculateMiningValue([["gold", 1]], [], new Map([["gold", 21000]]), new Map(), 0),
+  {
+    grossValue: 21000,
+    consumableCost: 0,
+    netValue: 21000,
+    valuePerAdventure: null,
+  },
+);
 assert.equal(calibrationBoards.length, 10);
 assert.equal(
   calibrationBoards.every((board) => board.length === 36),
@@ -128,6 +136,52 @@ remainingGold.update(oneGoldState, true, [[[1, 6], "gold"]]);
 assert.equal(remainingGold.decide().action, "mine");
 assert.throws(() => new StrategyController("ev", "low", 0, undefined, 1.01));
 
+for (const [resource, count] of [
+  ["ore", 6],
+  ["crystal", 3],
+] as const) {
+  const controller = new StrategyController("ev", "high", 1, {
+    ore: resource === "ore" ? 10000 : 0,
+    gold: 0,
+    crystal: resource === "crystal" ? 10000 : 0,
+    cave: 0,
+  });
+  const observations = Array.from(
+    { length: count },
+    (_, index) => [indexToCoordinate(index), resource] as const,
+  );
+  controller.update(
+    mineState([
+      ...Array.from({ length: count }, (_, index) => [30 + index, "o"] as [number, string]),
+      [24, "*"],
+    ]),
+    true,
+    observations,
+  );
+  assert.equal(controller.decide().action, "reset");
+}
+
+const resumedCaveState = mineState([
+  [30, "o"],
+  [31, "*"],
+]);
+const withoutCave = new StrategyController("ev", "low", 1750, {
+  ore: 0,
+  gold: 10000,
+  crystal: 0,
+  cave: 0,
+});
+withoutCave.update(resumedCaveState, false);
+assert.equal(withoutCave.decide().action, "reset");
+const withCave = new StrategyController("ev", "low", 1750, {
+  ore: 0,
+  gold: 10000,
+  crystal: 0,
+  cave: 0,
+});
+withCave.update(resumedCaveState, false, [[[1, 6], "cave"]]);
+assert.equal(withCave.decide().action, "mine");
+
 const pjb = new StrategyController("pjb", "low");
 pjb.update(mineState([[30, "*"]]), false);
 assert.deepEqual(pjb.decide(), {
@@ -186,6 +240,25 @@ remembered.update(mineState([[30, "o"]]), false);
 const second = remembered.decide();
 assert.equal(second.action, "mine");
 assert.deepEqual(second.coordinate, [1, 5]);
+
+const deepSparkle = mineState([[0, "*"]]);
+const lowVisibility = new StrategyController("ev", "low");
+lowVisibility.update(deepSparkle, true);
+assert.deepEqual((lowVisibility.decide() as { coordinate: [number, number] }).coordinate, [4, 6]);
+const highVisibility = new StrategyController("ev", "high");
+highVisibility.update(deepSparkle, true);
+assert.deepEqual((highVisibility.decide() as { coordinate: [number, number] }).coordinate, [1, 6]);
+const automaticVisibility = new StrategyController("ev", "auto");
+automaticVisibility.update(deepSparkle, false);
+assert.deepEqual(
+  (automaticVisibility.decide() as { coordinate: [number, number] }).coordinate,
+  [4, 6],
+);
+automaticVisibility.update(deepSparkle, true);
+assert.deepEqual(
+  (automaticVisibility.decide() as { coordinate: [number, number] }).coordinate,
+  [1, 6],
+);
 
 assert.throws(
   () => new StrategyController("ev", "low").update("short", false),

@@ -80,7 +80,7 @@ function runCalibration(values: StrategyValues): number {
     "blue",
   );
   print(
-    `Use: goldmine strategy=${args.strategy} visibility=${args.visibility} ` +
+    `Use: oreo strategy=${args.strategy} visibility=${args.visibility} ` +
       `lambda=${result.lambda} oreValue=${values.ore} goldValue=${values.gold} ` +
       `crystalValue=${values.crystal} dynamitePrice=${dynamitePrice} ` +
       `objectDetectionPrice=${objectDetectionPrice} secondGoldChance=${args.secondGoldChance}`,

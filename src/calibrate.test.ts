@@ -32,7 +32,7 @@ const result = calibrate({
 });
 assert.equal(Number.isFinite(result.rate), true);
 assert.deepEqual(result, calibrate(options));
-assert.deepEqual(progress.at(-1), [4, 4]);
+assert.deepEqual(progress[progress.length - 1], [4, 4]);
 assert.throws(() => calibrate({ ...options, boardCount: 0 }), /positive integer boards/);
 assert.throws(
   () =>

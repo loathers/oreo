@@ -1,16 +1,16 @@
-# goldmine
+# oreo
 
-`goldmine` is a KoLmafia TypeScript script for farming the Velvet / Gold Mine with
-selectable mining strategies. It retains Oreo's equipment acquisition, hot-resistance
-handling, optional survival checks, free-mine accounting, session summary, dynamite,
-and holo-wrist-puter support.
+**oreo** is a KoLmafia TypeScript script for farming 1,970 carat gold in the
+Velvet / Gold Mine. It supports selectable mining strategies while retaining
+its equipment acquisition, hot-resistance handling, optional survival checks,
+free-mine accounting, dynamite, and holo-wrist-puter support.
 
 ## Install
 
 Run this in the KoLmafia gCLI:
 
 ```text
-git checkout mark-e-duda/goldmine release
+git checkout loathers/oreo release
 ```
 
 ## Build
@@ -18,7 +18,7 @@ git checkout mark-e-duda/goldmine release
 This project uses Oreo's Rollup/Babel pipeline and produces:
 
 ```text
-dist/scripts/goldmine/goldmine.js
+dist/scripts/oreo/oreo.js
 ```
 
 After restoring the dependencies in an environment where package installation is
@@ -32,8 +32,8 @@ yarn install-mafia
 ## Usage
 
 ```text
-goldmine 100 strategy=ev-cluster visibility=auto
-goldmine help
+oreo 100 strategy=ev-cluster visibility=auto
+oreo help
 ```
 
 The positional number is the number of turns to spend. As in Oreo, `0` uses only
@@ -105,9 +105,9 @@ EV strategies can sweep λ against a deterministic bundled synthetic board
 generator:
 
 ```text
-goldmine calibrate strategy=ev-cluster visibility=high
-goldmine calibrate strategy=ev visibility=low dynamitePrice=mall oreValue=mall
-goldmine 100 strategy=ev visibility=high calibrate=true
+oreo calibrate strategy=ev-cluster visibility=high
+oreo calibrate strategy=ev visibility=low dynamitePrice=mall oreValue=mall
+oreo 100 strategy=ev visibility=high calibrate=true
 ```
 
 The default coarse sweep is 500–9000 in steps of 500, followed by six fine
@@ -141,5 +141,4 @@ The script does not diet for you. Fill your organs before running it.
 
 ## Credits
 
-The KoLmafia task engine, mining API, equipment handling, and build scaffold are
-derived from [loathers/oreo](https://github.com/loathers/oreo), licensed under MIT.
+The script is pronounced ore-o, because it helps you mine ore.

@@ -42,7 +42,7 @@ export class MiningEngine extends Engine<never, Task> {
     const collected = [...diff.items].filter(
       ([item, quantity]) => quantity > 0 && !this.accounting.costs.has(item),
     );
-    printHighlight(`goldmine has run ${diff.totalTurns} turns.`);
+    printHighlight(`oreo has run ${diff.totalTurns} turns.`);
     printHighlight("Items collected:");
     for (const [item, quantity] of collected) {
       const value = (this.accounting.values.get(item) ?? 0) * quantity;
