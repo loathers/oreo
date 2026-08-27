@@ -51,6 +51,11 @@ export function evaluateCalibration(
   let objectDetectionUses = 0;
 
   for (const board of boards) {
+    if (fullVisibility && effectTurns <= 0) {
+      totalValue -= objectDetectionPrice;
+      effectTurns = 10;
+      objectDetectionUses++;
+    }
     const controller = new StrategyController(
       strategy,
       visibility,
@@ -63,13 +68,7 @@ export function evaluateCalibration(
     const opened = new Set<number>();
 
     for (let actions = 0; actions < 36; actions++) {
-      if (fullVisibility && effectTurns <= 0) {
-        totalValue -= objectDetectionPrice;
-        effectTurns = 10;
-        objectDetectionUses++;
-      }
-      const hasObjectDetection = fullVisibility && effectTurns > 0;
-      controller.update(mineState(board, opened, hasObjectDetection), hasObjectDetection);
+      controller.update(mineState(board, opened, fullVisibility), fullVisibility);
       const decision = controller.decide();
       if (decision.action === "reset") break;
 
@@ -81,7 +80,7 @@ export function evaluateCalibration(
       if (dynamite) totalValue -= dynamitePrice;
       else {
         totalTurns++;
-        if (hasObjectDetection) effectTurns--;
+        if (fullVisibility) effectTurns--;
       }
       if (resource) totalValue += values[resource];
       controller.recordMine(decision.coordinate, resource === "cave" ? null : resource);

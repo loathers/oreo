@@ -57,10 +57,10 @@ const visibilityMetrics = evaluateCalibration(
   { ore: 100000, gold: 100000, crystal: 100000, cave: 0 },
   10000,
   100,
-  makeCalibrationBoards(2, 12345, 0.496),
+  makeCalibrationBoards(1, 12345, 0.496),
   0.496,
 );
 assert.equal(visibilityMetrics.totalTurns > 10, true);
-assert.equal(visibilityMetrics.objectDetectionUses, Math.ceil(visibilityMetrics.totalTurns / 10));
+assert.equal(visibilityMetrics.objectDetectionUses, 1);
 
 console.log("calibration checks passed");

@@ -58,7 +58,7 @@ Visibility is independent of strategy:
 | ------ | ------------------------------------------------------------------------- |
 | `low`  | Ignore non-minable sparkle information                                    |
 | `auto` | Use Object Detection when already available; otherwise use low visibility |
-| `high` | Maintain Object Detection with potions of detection                       |
+| `high` | Reveal each cavern with a potion of detection and remember its sparkles   |
 
 The default is `auto`. High visibility remembers every revealed sparkle for the
 remainder of the current cavern even if the effect expires. Unused effect turns

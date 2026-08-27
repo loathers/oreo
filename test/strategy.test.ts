@@ -298,14 +298,27 @@ assert.throws(() => unavailableDynamite.setDynamiteAvailable(-1), /non-negative 
 
 const remembered = new StrategyController("ev-cluster", "auto");
 remembered.update(mineState([[0, "*"]]), true);
+assert.equal(remembered.needsObjectDetection(), false);
 const first = remembered.decide();
 assert.equal(first.action, "mine");
 assert.deepEqual(first.coordinate, [1, 6]);
 remembered.recordMine(first.coordinate, null);
 remembered.update(mineState([[30, "o"]]), false);
+assert.equal(remembered.needsObjectDetection(), false);
 const second = remembered.decide();
 assert.equal(second.action, "mine");
 assert.deepEqual(second.coordinate, [1, 5]);
+remembered.reset();
+assert.equal(remembered.needsObjectDetection(), false);
+
+const highMemory = new StrategyController("ev-cluster", "high");
+assert.equal(highMemory.needsObjectDetection(), true);
+highMemory.update(mineState([[0, "*"]]), true);
+assert.equal(highMemory.needsObjectDetection(), false);
+highMemory.update(mineState([[30, "o"]]), false);
+assert.equal(highMemory.needsObjectDetection(), false);
+highMemory.reset();
+assert.equal(highMemory.needsObjectDetection(), true);
 
 const deepSparkle = mineState([[0, "*"]]);
 const lowVisibility = new StrategyController("ev", "low");

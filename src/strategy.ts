@@ -309,6 +309,10 @@ export class StrategyController {
     return this.strategy === "pjb" || this.strategy === "oreo";
   }
 
+  needsObjectDetection(): boolean {
+    return this.visibility === "high" && !this.fullMineSeen;
+  }
+
   setDynamitePrice(price: number): void {
     if (!Number.isFinite(price) || price < 0)
       throw new Error("Dynamite price must be non-negative.");

@@ -110,7 +110,8 @@ export function buildMiningTasks(
       name: "Maintain Object Detection",
       after: ["Acquire mining drill"],
       noCombat: true,
-      ready: () => args.visibility === "high" && !Mining.hasObjectDetection(Mining.Mine.VOLCANO),
+      ready: () =>
+        controller.needsObjectDetection() && !Mining.hasObjectDetection(Mining.Mine.VOLCANO),
       do: () => {
         ensureEffect($effect`Object Detection`);
         if (detectionPotion) recordItemUse(accounting, detectionPotion);
