@@ -5,7 +5,6 @@ import {
   myAdventures,
   myInebriety,
   print,
-  toItem,
   totalTurnsPlayed,
 } from "kolmafia";
 import { $item, get, Mining, sinceKolmafiaRevision } from "libram";
@@ -13,7 +12,7 @@ import { $item, get, Mining, sinceKolmafiaRevision } from "libram";
 import { args, parsePrice } from "./args.js";
 import { calibrate } from "./calibrate.js";
 import { type MiningAccounting, MiningEngine, Task } from "./engine.js";
-import { resolvePrice } from "./pricing.js";
+import { resolveObjectDetectionPrice, resolvePrice } from "./pricing.js";
 import {
   STRATEGIES,
   StrategyController,
@@ -23,25 +22,23 @@ import {
   VisibilityMode,
 } from "./strategy.js";
 import { buildMiningTasks } from "./tasks.js";
+import { printError } from "./utils.js";
 
 function runCalibration(values: StrategyValues): number {
   if (args.strategy !== "ev" && args.strategy !== "ev-cluster") {
     abort("Calibration is only available for the ev and ev-cluster strategies.");
   }
   if (
-    args.calibrationMin < 0 ||
+    args.calibrationMin <= 0 ||
     args.calibrationMax <= args.calibrationMin ||
     args.calibrationStep <= 0 ||
     args.calibrationFineSteps < 0 ||
     !Number.isInteger(args.calibrationBoards) ||
-    args.calibrationBoards <= 0 ||
-    !Number.isFinite(args.secondGoldChance) ||
-    args.secondGoldChance < 0 ||
-    args.secondGoldChance > 1
+    args.calibrationBoards <= 0
   ) {
     abort(
-      "Calibration requires 0 <= min < max, step > 0, fineSteps >= 0, " +
-        "positive integer boards, and 0 <= P(2 gold) <= 1.",
+      "Calibration requires 0 < min < max, step > 0, fineSteps >= 0, " +
+        "and positive integer boards.",
     );
   }
   print(
@@ -50,9 +47,7 @@ function runCalibration(values: StrategyValues): number {
   );
   const dynamitePrice = resolvePrice(args.dynamitePrice, $item`minin' dynamite`);
   const objectDetectionPrice =
-    args.visibility === "high"
-      ? resolvePrice(args.objectDetectionPrice, toItem("potion of detection"))
-      : 0;
+    args.visibility === "high" ? resolveObjectDetectionPrice(args.objectDetectionPrice) : 0;
   const result = calibrate({
     strategy: args.strategy,
     visibility: args.visibility as VisibilityMode,
@@ -109,6 +104,7 @@ function runMining(values: StrategyValues, lambda: number): void {
     ]),
     costs: new Map(),
     used: new Map(),
+    actualMeatSpent: 0,
   };
   const quest: Quest<Task> = {
     name: "Goldmine",
@@ -122,6 +118,7 @@ function runMining(values: StrategyValues, lambda: number): void {
         lambda,
         values,
         args.secondGoldChance,
+        printError,
       ),
       accounting,
     ),
@@ -153,6 +150,13 @@ export function main(argstring = "") {
     abort(`Unknown visibility "${args.visibility}". Choose: ${VISIBILITIES.join(", ")}.`);
   }
   if (args.lambda < 0) abort("lambda must be zero (automatic) or positive.");
+  if (
+    !Number.isFinite(args.secondGoldChance) ||
+    args.secondGoldChance < 0 ||
+    args.secondGoldChance > 1
+  ) {
+    abort("secondGoldChance must be between zero and one.");
+  }
   if (parsePrice(args.objectDetectionPrice) === null) {
     abort('objectDetectionPrice must be non-negative or "mall".');
   }

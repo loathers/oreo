@@ -1,5 +1,5 @@
 import { Task as BaseTask, CombatResources, CombatStrategy, Engine } from "grimoire-kolmafia";
-import { type Item } from "kolmafia";
+import { type Item, myMeat } from "kolmafia";
 import { Session } from "libram";
 
 import { calculateMiningValue } from "./accounting.js";
@@ -14,6 +14,7 @@ export type MiningAccounting = {
   values: Map<Item, number>;
   costs: Map<Item, number>;
   used: Map<Item, number>;
+  actualMeatSpent: number;
 };
 
 export function recordItemUse(accounting: MiningAccounting, item: Item, quantity = 1): void {
@@ -40,8 +41,14 @@ export class MiningEngine extends Engine<never, Task> {
 
     const diff = Session.current().diff(this.session);
     const collected = [...diff.items].filter(
-      ([item, quantity]) => quantity > 0 && !this.accounting.costs.has(item),
+      ([item, quantity]) => quantity > 0 && this.accounting.values.has(item),
     );
+    const expectedInputs = new Map(this.accounting.used);
+    for (const [item, quantity] of diff.items) {
+      if (quantity > 0 && this.accounting.costs.has(item)) {
+        expectedInputs.set(item, (expectedInputs.get(item) ?? 0) + quantity);
+      }
+    }
     printHighlight(`oreo has run ${diff.totalTurns} turns.`);
     printHighlight("Items collected:");
     for (const [item, quantity] of collected) {
@@ -59,19 +66,30 @@ export class MiningEngine extends Engine<never, Task> {
 
     const summary = calculateMiningValue(
       collected,
-      this.accounting.used,
+      expectedInputs,
       this.accounting.values,
       this.accounting.costs,
       diff.totalTurns,
+      this.accounting.actualMeatSpent,
     );
     printHighlight(`Gross collected value: ${summary.grossValue} Meat`);
-    printHighlight(`Consumable cost: ${summary.consumableCost} Meat`);
+    printHighlight(`Expected item cost: ${summary.expectedCost} Meat`);
+    printHighlight(`Actual Meat spent on purchases: ${summary.actualMeatSpent} Meat`);
     printHighlight(`Total value achieved: ${summary.netValue} Meat`);
     printHighlight(
       summary.valuePerAdventure !== null
         ? `Session value: ${summary.valuePerAdventure.toFixed(1)} Meat/Adventure`
         : "Session value: N/A (no adventures spent)",
     );
+  }
+
+  execute(task: Task): void {
+    const meatBefore = myMeat();
+    try {
+      super.execute(task);
+    } finally {
+      this.accounting.actualMeatSpent += Math.max(0, meatBefore - myMeat());
+    }
   }
 
   setCombat(

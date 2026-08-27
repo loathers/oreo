@@ -30,7 +30,7 @@ function mineState(board: string, opened: Set<number>, fullVisibility: boolean):
   return state.join("");
 }
 
-function evaluate(
+export function evaluateCalibration(
   lambda: number,
   strategy: StrategyName,
   visibility: VisibilityMode,
@@ -39,17 +39,18 @@ function evaluate(
   objectDetectionPrice: number,
   boards: string[],
   secondGoldChance: number,
-): number {
+): {
+  rate: number;
+  totalTurns: number;
+  objectDetectionUses: number;
+} {
   const fullVisibility = visibility === "high";
   let effectTurns = 0;
   let totalValue = 0;
   let totalTurns = 0;
+  let objectDetectionUses = 0;
 
   for (const board of boards) {
-    if (fullVisibility && effectTurns <= 0) {
-      totalValue -= objectDetectionPrice;
-      effectTurns = 10;
-    }
     const controller = new StrategyController(
       strategy,
       visibility,
@@ -58,28 +59,39 @@ function evaluate(
       secondGoldChance,
     );
     controller.setDynamitePrice(dynamitePrice);
+    controller.setDynamiteAvailable(36);
     const opened = new Set<number>();
 
     for (let actions = 0; actions < 36; actions++) {
-      controller.update(mineState(board, opened, fullVisibility), fullVisibility);
+      if (fullVisibility && effectTurns <= 0) {
+        totalValue -= objectDetectionPrice;
+        effectTurns = 10;
+        objectDetectionUses++;
+      }
+      const hasObjectDetection = fullVisibility && effectTurns > 0;
+      controller.update(mineState(board, opened, hasObjectDetection), hasObjectDetection);
       const decision = controller.decide();
       if (decision.action === "reset") break;
 
       const index = coordinateToIndex(decision.coordinate);
       const code = board[index];
       const resource = TYPE[code];
-      const dynamite = code === "e" && dynamitePrice < lambda;
+      const dynamite = code === "e" && controller.shouldUseDynamite();
       opened.add(index);
       if (dynamite) totalValue -= dynamitePrice;
       else {
         totalTurns++;
-        if (fullVisibility) effectTurns--;
+        if (hasObjectDetection) effectTurns--;
       }
       if (resource) totalValue += values[resource];
       controller.recordMine(decision.coordinate, resource === "cave" ? null : resource);
     }
   }
-  return totalTurns > 0 ? totalValue / totalTurns : Number.NEGATIVE_INFINITY;
+  return {
+    rate: totalTurns > 0 ? totalValue / totalTurns : Number.NEGATIVE_INFINITY,
+    totalTurns,
+    objectDetectionUses,
+  };
 }
 
 export type CalibrationOptions = {
@@ -117,8 +129,8 @@ export function calibrate(options: CalibrationOptions) {
   if (strategy !== "ev" && strategy !== "ev-cluster") {
     throw new Error("Calibration is only available for EV strategies.");
   }
-  if (min < 0 || max <= min || step <= 0 || fineSteps < 0) {
-    throw new Error("Calibration requires 0 <= min < max, step > 0, and fineSteps >= 0.");
+  if (min <= 0 || max <= min || step <= 0 || fineSteps < 0) {
+    throw new Error("Calibration requires 0 < min < max, step > 0, and fineSteps >= 0.");
   }
   if (
     !Number.isInteger(boardCount) ||
@@ -144,7 +156,7 @@ export function calibrate(options: CalibrationOptions) {
   const rate = (lambda: number) => {
     const cached = rates.get(lambda);
     if (cached !== undefined) return cached;
-    const result = evaluate(
+    const result = evaluateCalibration(
       lambda,
       strategy,
       visibility,
@@ -154,8 +166,8 @@ export function calibrate(options: CalibrationOptions) {
       boards,
       secondGoldChance,
     );
-    rates.set(lambda, result);
-    return result;
+    rates.set(lambda, result.rate);
+    return result.rate;
   };
   const provisionalTotal = coarse.length + fineSteps;
   let completed = 0;

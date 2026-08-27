@@ -1,10 +1,10 @@
-import { abort, equippedAmount, itemAmount, toItem, use } from "kolmafia";
+import { abort, equippedAmount, itemAmount, use } from "kolmafia";
 import { $effect, $item, ensureEffect, get, have, Mining } from "libram";
 
 import { args } from "./args.js";
 import { type MiningAccounting, recordItemUse, Task } from "./engine.js";
 import { parseMineLayout } from "./mine-layout.js";
-import { resolvePrice } from "./pricing.js";
+import { objectDetectionPotion, resolveObjectDetectionPrice, resolvePrice } from "./pricing.js";
 import { type Decision, type ResourceType, StrategyController } from "./strategy.js";
 import { assureHotResistance, explain, mineCoordinate, prepareToMine } from "./utils.js";
 
@@ -12,6 +12,10 @@ const gold = $item`1,970 carat gold`;
 const velvet = $item`unsmoothed velvet`;
 const crystal = $item`New Age healing crystal`;
 const dynamite = $item`minin' dynamite`;
+const sheetMetal = $item`heat-resistant sheet metal`;
+const brokenDrill = $item`broken high-temperature mining drill`;
+const miningDrill = $item`high-temperature mining drill`;
+const medicalKit = $item`hippy medical kit`;
 
 function minedResource(before: Record<ResourceType, number>): ResourceType | null {
   if (itemAmount(gold) > before.gold) return "gold";
@@ -26,13 +30,18 @@ export function buildMiningTasks(
 ): Task[] {
   const dynamitePrice = resolvePrice(args.dynamitePrice, dynamite);
   accounting.costs.set(dynamite, dynamitePrice);
-  const detectionPotion = args.visibility === "high" ? toItem("potion of detection") : null;
+  if (!have(miningDrill)) {
+    accounting.costs.set(sheetMetal, resolvePrice("mall", sheetMetal));
+    accounting.costs.set(brokenDrill, resolvePrice("mall", brokenDrill));
+  }
+  if (!have(medicalKit)) accounting.costs.set(medicalKit, resolvePrice("mall", medicalKit));
+  const detectionPotion = args.visibility === "high" ? objectDetectionPotion() : null;
   if (detectionPotion) {
-    accounting.costs.set(detectionPotion, resolvePrice(args.objectDetectionPrice, detectionPotion));
+    accounting.costs.set(detectionPotion, resolveObjectDetectionPrice(args.objectDetectionPrice));
   }
   controller.setDynamitePrice(dynamitePrice);
   const miningOutfit = {
-    equip: [$item`high-temperature mining drill`, $item`hippy medical kit`],
+    equip: [miningDrill, medicalKit],
     modifier: "Hot Resistance",
   };
   const taskOutfit = args.useMiningOutfit ? miningOutfit : undefined;
@@ -40,6 +49,9 @@ export function buildMiningTasks(
 
   const selectDecision = () => {
     if (pendingDecision) return pendingDecision;
+    controller.setDynamiteAvailable(
+      Math.max(itemAmount(dynamite), controller.shouldUseDynamite() ? 1 : 0),
+    );
     controller.update(
       Mining.getState(Mining.Mine.VOLCANO),
       Mining.hasObjectDetection(Mining.Mine.VOLCANO),
@@ -61,20 +73,24 @@ export function buildMiningTasks(
       name: "Acquire mining drill",
       noCombat: true,
       limit: { tries: 1 },
-      acquire: [
-        { item: $item`heat-resistant sheet metal` },
-        { item: $item`broken high-temperature mining drill` },
-      ],
-      do: () => use(1, $item`broken high-temperature mining drill`),
-      completed: () => have($item`high-temperature mining drill`),
+      acquire: [{ item: sheetMetal }, { item: brokenDrill }],
+      do: () => {
+        const drillBefore = itemAmount(miningDrill);
+        use(1, brokenDrill);
+        if (itemAmount(miningDrill) > drillBefore) {
+          recordItemUse(accounting, sheetMetal);
+          recordItemUse(accounting, brokenDrill);
+        }
+      },
+      completed: () => have(miningDrill),
     },
     {
       name: "Acquire hippy medical kit",
       noCombat: true,
       limit: { tries: 1 },
-      acquire: [{ item: $item`hippy medical kit` }],
+      acquire: [{ item: medicalKit }],
       do: () => {},
-      completed: () => have($item`hippy medical kit`),
+      completed: () => have(medicalKit),
     },
     {
       name: "Move to a new cavern having struck gold in this cavern",
@@ -126,7 +142,8 @@ export function buildMiningTasks(
             ],
           })
         : undefined,
-      acquire: () => (controller.shouldUseDynamite() ? [{ item: dynamite, optional: true }] : []),
+      acquire: () =>
+        controller.shouldUseDynamite() ? [{ item: dynamite, price: dynamitePrice }] : [],
       ready: () => selectDecision().action === "mine",
       prepare: () => {
         if (!args.useMiningOutfit && equippedAmount($item`high-temperature mining drill`) === 0) {

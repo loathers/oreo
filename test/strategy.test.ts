@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 
 import { calculateMiningValue } from "../src/accounting.ts";
+import { detectionPotionId } from "../src/bang-potion.ts";
 import { parseMineLayout } from "../src/mine-layout.ts";
 import {
   coordinateToIndex,
@@ -11,6 +12,14 @@ import {
 } from "../src/strategy.ts";
 
 const calibrationBoards = makeCalibrationBoards(10, 12345, 0.496);
+assert.equal(
+  detectionPotionId(() => ""),
+  null,
+);
+assert.equal(
+  detectionPotionId((name) => (name === "lastBangPotion823" ? "detection" : "")),
+  823,
+);
 assert.deepEqual(
   calculateMiningValue<string>(
     [["gold", 2]],
@@ -27,7 +36,8 @@ assert.deepEqual(
   ),
   {
     grossValue: 42000,
-    consumableCost: 15120,
+    expectedCost: 15120,
+    actualMeatSpent: 0,
     netValue: 26880,
     valuePerAdventure: 2688,
   },
@@ -36,9 +46,27 @@ assert.deepEqual(
   calculateMiningValue([["gold", 1]], [], new Map([["gold", 21000]]), new Map(), 0),
   {
     grossValue: 21000,
-    consumableCost: 0,
+    expectedCost: 0,
+    actualMeatSpent: 0,
     netValue: 21000,
     valuePerAdventure: null,
+  },
+);
+assert.deepEqual(
+  calculateMiningValue(
+    [["gold", 1]],
+    [["pre-existing dynamite", 1]],
+    new Map([["gold", 21000]]),
+    new Map([["pre-existing dynamite", 500]]),
+    10,
+    1000,
+  ),
+  {
+    grossValue: 21000,
+    expectedCost: 500,
+    actualMeatSpent: 1000,
+    netValue: 20500,
+    valuePerAdventure: 2050,
   },
 );
 assert.equal(calibrationBoards.length, 10);
@@ -80,6 +108,16 @@ assert.deepEqual(
 function mineState(entries: Array<[position: number, value: string]>): string {
   const state = Array(36).fill(".");
   for (const [position, value] of entries) state[position] = value;
+  return state.join("");
+}
+
+function visibleState(board: string, opened: ReadonlySet<number>): string {
+  const state = Array(36).fill("X");
+  for (let index = 0; index < board.length; index++) {
+    const row = Math.floor(index / 6);
+    const position = (5 - row) * 6 + (index % 6);
+    state[position] = opened.has(index) ? "o" : board[index] === "e" ? "X" : "*";
+  }
   return state.join("");
 }
 
@@ -135,6 +173,28 @@ const remainingGold = new StrategyController(
 remainingGold.update(oneGoldState, true, [[[1, 6], "gold"]]);
 assert.equal(remainingGold.decide().action, "mine");
 assert.throws(() => new StrategyController("ev", "low", 0, undefined, 1.01));
+
+const oreEvidence = new StrategyController(
+  "ev",
+  "low",
+  1,
+  { ore: 10000, gold: 0, crystal: 0, cave: 0 },
+  0,
+);
+oreEvidence.update(
+  mineState([
+    [24, "o"],
+    [28, "o"],
+    [18, "*"],
+    [22, "*"],
+  ]),
+  false,
+  [
+    [indexToCoordinate(6), "cave"],
+    [indexToCoordinate(10), "ore"],
+  ],
+);
+assert.deepEqual((oreEvidence.decide() as { coordinate: [number, number] }).coordinate, [5, 4]);
 
 for (const [resource, count] of [
   ["ore", 6],
@@ -227,8 +287,14 @@ noDynamite.update(pricedRoute, true);
 assert.equal(noDynamite.decide().action, "reset");
 const freeDynamite = new StrategyController("ev", "high");
 freeDynamite.setDynamitePrice(0);
+freeDynamite.setDynamiteAvailable(1);
 freeDynamite.update(pricedRoute, true);
 assert.equal(freeDynamite.decide().action, "mine");
+const unavailableDynamite = new StrategyController("ev", "high");
+unavailableDynamite.setDynamitePrice(0);
+unavailableDynamite.update(pricedRoute, true);
+assert.equal(unavailableDynamite.decide().action, "reset");
+assert.throws(() => unavailableDynamite.setDynamiteAvailable(-1), /non-negative integer/);
 
 const remembered = new StrategyController("ev-cluster", "auto");
 remembered.update(mineState([[0, "*"]]), true);
@@ -260,9 +326,50 @@ assert.deepEqual(
   [1, 6],
 );
 
-assert.throws(
-  () => new StrategyController("ev", "low").update("short", false),
-  /Expected 36 mine-state cells/,
+const unavailableState = new StrategyController("ev", "low");
+unavailableState.update("short", false);
+assert.deepEqual(unavailableState.decide(), {
+  action: "reset",
+  reason: "mine state is unavailable",
+});
+
+const lostLayoutBoard = "eceeereeeeeeregereceeeeegceeecoooooo";
+const lostLayoutWarnings: string[] = [];
+const lostLayout = new StrategyController(
+  "ev-cluster",
+  "high",
+  1,
+  { ore: 10000, gold: 0, crystal: 0, cave: 0 },
+  0.496,
+  (warning) => lostLayoutWarnings.push(warning),
 );
+lostLayout.update(visibleState(lostLayoutBoard, new Set([31])), true);
+lostLayout.decide();
+assert.deepEqual(lostLayoutWarnings, []);
+
+const impossibleWarnings: string[] = [];
+const impossibleCluster = new StrategyController(
+  "ev-cluster",
+  "high",
+  1,
+  { ore: 10000, gold: 0, crystal: 0, cave: 0 },
+  0.496,
+  (warning) => impossibleWarnings.push(warning),
+);
+const contradictoryState = visibleState("oooooooooooooooooooooooooooooooooooo", new Set([12, 35]));
+impossibleCluster.update(contradictoryState, true, [
+  [indexToCoordinate(12), "ore"],
+  [indexToCoordinate(35), "ore"],
+]);
+impossibleCluster.decide();
+impossibleCluster.decide();
+assert.equal(impossibleWarnings.length, 1);
+impossibleCluster.reset();
+impossibleCluster.update(contradictoryState, true, [
+  [indexToCoordinate(12), "ore"],
+  [indexToCoordinate(35), "ore"],
+]);
+impossibleCluster.decide();
+assert.equal(impossibleWarnings.length, 2);
 
 console.log("strategy checks passed");

@@ -64,14 +64,16 @@ The default is `auto`. High visibility remembers every revealed sparkle for the
 remainder of the current cavern even if the effect expires. Unused effect turns
 naturally carry across cavern resets.
 
-KoLmafia identifies and acquires the ascension-specific bang potion.
-`objectDetectionPrice=mall` (the default) resolves that potion and queries its
-Mall price for EV calibration; normal KoLmafia acquisition limits still apply.
+You must identify the ascension-specific potion of detection before using high
+visibility for mining. `objectDetectionPrice=mall` (the default) queries the
+identified potion's Mall price for EV calibration.
 
 ### Dynamite
 
 Minin' dynamite makes a minable non-sparkle route tile free. The script buys it
-when its price is below the strategy's estimated value of the saved turn.
+when its price is below the strategy's estimated value of the saved turn, caps
+the purchase at that configured price, and only discounts a route after the
+dynamite has been acquired.
 `dynamitePrice` defaults to `mall`, which queries the current Mall price. A
 positive `lambda` override also becomes the saved-turn value for
 EV strategies.
@@ -117,6 +119,8 @@ probability of a second gold. Increase `calibrationBoards` for a deeper run;
 override the generator with `calibrationSeed` and
 `secondGoldChance`, or the sweep with `calibrationMin`,
 `calibrationMax`, `calibrationStep`, and `calibrationFineSteps`.
+`calibrationMin` must be positive because `lambda=0` means to use a bundled
+default during live mining.
 The same second-gold probability is used by live EV decisions.
 Set `calibrate=true` on a normal mining command to calibrate first and then
 continue mining with the resulting λ. The standalone `calibrate` subcommand
@@ -129,6 +133,11 @@ because calibration does not assume an existing Object Detection effect.
 Calibration prints a copy-pasteable command containing the resulting `lambda`
 and every resolved resource and consumable price; it does not replace the
 bundled defaults.
+
+Session value uses configured item costs so it remains comparable with EV
+decisions and calibrated thresholds. The summary separately reports actual
+Meat spent by script tasks. Expected cost includes first-run setup purchases,
+consumed items, and dynamite bought but not yet used.
 
 ## Other options
 

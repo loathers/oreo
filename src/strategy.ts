@@ -191,7 +191,7 @@ function clusterOrePosterior(
   knownOre: Set<number>,
   knownNonOre: Set<number>,
   sparkleSubset: Set<number> | null,
-): number[] {
+): number[] | null {
   const mass = Array(36).fill(0) as number[];
   let total = 0;
   for (const cluster of ORE_CLUSTERS) {
@@ -201,9 +201,8 @@ function clusterOrePosterior(
     total += cluster.weight;
     for (const tile of cluster.tiles) mass[tile] += cluster.weight;
   }
-  if (total > 0) {
-    for (let index = 0; index < mass.length; index++) mass[index] /= total;
-  }
+  if (total === 0) return null;
+  for (let index = 0; index < mass.length; index++) mass[index] /= total;
   return mass;
 }
 
@@ -215,11 +214,15 @@ export class StrategyController {
   private plannedPath: number[] = [];
   private fullMineSeen = false;
   private dynamitePrice = Infinity;
+  private dynamiteAvailable = 0;
+  private stateAvailable = true;
+  private warnedImpossibleCluster = false;
   readonly strategy: StrategyName;
   readonly visibility: VisibilityMode;
   readonly lambdaOverride: number;
   readonly values: StrategyValues;
   readonly secondGoldChance: number;
+  readonly onWarning: (message: string) => void;
 
   constructor(
     strategy: StrategyName,
@@ -227,6 +230,7 @@ export class StrategyController {
     lambdaOverride = 0,
     values: StrategyValues = DEFAULT_VALUES,
     secondGoldChance = 0.496,
+    onWarning: (message: string) => void = () => {},
   ) {
     if (!Number.isFinite(secondGoldChance) || secondGoldChance < 0 || secondGoldChance > 1) {
       throw new Error("Second-gold chance must be between zero and one.");
@@ -236,6 +240,7 @@ export class StrategyController {
     this.lambdaOverride = lambdaOverride;
     this.values = values;
     this.secondGoldChance = secondGoldChance;
+    this.onWarning = onWarning;
   }
 
   reset(): void {
@@ -245,6 +250,8 @@ export class StrategyController {
     this.opened.clear();
     this.plannedPath = [];
     this.fullMineSeen = false;
+    this.stateAvailable = true;
+    this.warnedImpossibleCluster = false;
   }
 
   update(
@@ -253,8 +260,14 @@ export class StrategyController {
     previouslyMined: Iterable<readonly [MiningCoordinate, ResourceType]> = [],
   ): void {
     if (rawState.length !== 36) {
-      throw new Error(`Expected 36 mine-state cells, received ${rawState.length}`);
+      this.knownSparkles.clear();
+      this.knownDull.clear();
+      this.opened.clear();
+      this.plannedPath = [];
+      this.stateAvailable = false;
+      return;
     }
+    this.stateAvailable = true;
 
     this.opened = new Set<number>();
     for (let position = 0; position < rawState.length; position++) {
@@ -302,11 +315,22 @@ export class StrategyController {
     this.dynamitePrice = price;
   }
 
+  setDynamiteAvailable(quantity: number): void {
+    if (!Number.isInteger(quantity) || quantity < 0) {
+      throw new Error("Available dynamite must be a non-negative integer.");
+    }
+    if (this.dynamiteAvailable > 0 && quantity === 0) this.plannedPath = [];
+    this.dynamiteAvailable = quantity;
+  }
+
   shouldUseDynamite(): boolean {
     return this.dynamitePrice < this.turnValue();
   }
 
   decide(): Decision {
+    if (!this.stateAvailable) {
+      return { action: "reset", reason: "mine state is unavailable" };
+    }
     if (this.plannedPath.length > 0) {
       const next = this.plannedPath[0];
       if (isLegal(next, this.opened)) {
@@ -385,7 +409,9 @@ export class StrategyController {
     let best: { path: number[]; score: number; reward: number } | null = null;
     const lambda = this.turnValue();
     const paths = minimumCostPaths(this.opened, starts, (index) =>
-      this.knownDull.has(index) && this.shouldUseDynamite() ? this.dynamitePrice : lambda,
+      this.knownDull.has(index) && this.shouldUseDynamite() && this.dynamiteAvailable > 0
+        ? this.dynamitePrice
+        : lambda,
     );
     for (const target of [...this.knownSparkles].sort((a, b) => a - b)) {
       const route = paths.get(target);
@@ -482,9 +508,7 @@ export class StrategyController {
       let pOre = oreProbability.get(index) ?? 0;
       if (!this.fullMineSeen && rowOf(index) >= 2 && counts.oreRemaining > 0) {
         const adjacentPossibleOre = neighbors[index].some(
-          (neighbor) =>
-            this.observed.get(neighbor) === "ore" ||
-            (!this.opened.has(neighbor) && rowOf(neighbor) >= 2),
+          (neighbor) => this.observed.get(neighbor) === "ore" || this.knownSparkles.has(neighbor),
         );
         pOre = Math.min(1, ROW_ORE_WEIGHT[rowOf(index)] * (adjacentPossibleOre ? 1 : 0.3));
       }
@@ -501,11 +525,22 @@ export class StrategyController {
       else knownNonOre.add(index);
     }
     for (const index of this.knownDull) knownNonOre.add(index);
-    for (const index of this.opened) {
-      if (!knownOre.has(index)) knownNonOre.add(index);
-    }
-    const subset = this.fullMineSeen ? new Set([...this.knownSparkles, ...knownOre]) : null;
+    const unknownOpened = [...this.opened].filter(
+      (index) => !this.observed.has(index) && !this.knownDull.has(index),
+    );
+    const subset = this.fullMineSeen
+      ? new Set([...this.knownSparkles, ...knownOre, ...unknownOpened])
+      : null;
     const pOre = clusterOrePosterior(knownOre, knownNonOre, subset);
+    if (pOre === null) {
+      if (!this.warnedImpossibleCluster) {
+        this.onWarning(
+          "Observed mine state is inconsistent with every ore cluster; using per-tile estimates.",
+        );
+        this.warnedImpossibleCluster = true;
+      }
+      return this.perTileExpectedValues();
+    }
     const targetCount = this.fullMineSeen
       ? this.knownSparkles.size
       : TARGETS_PER_MINE - this.observed.size;

@@ -10,7 +10,8 @@ registerHooks({
   },
 });
 
-const { calibrate } = await import("../src/calibrate.ts");
+const { calibrate, evaluateCalibration } = await import("../src/calibrate.ts");
+const { makeCalibrationBoards } = await import("../src/strategy.ts");
 const options = {
   strategy: "ev" as const,
   visibility: "low" as const,
@@ -34,6 +35,7 @@ assert.equal(Number.isFinite(result.rate), true);
 assert.deepEqual(result, calibrate(options));
 assert.deepEqual(progress[progress.length - 1], [4, 4]);
 assert.throws(() => calibrate({ ...options, boardCount: 0 }), /positive integer boards/);
+assert.throws(() => calibrate({ ...options, min: 0 }), /0 < min/);
 assert.throws(
   () =>
     calibrate({
@@ -47,5 +49,18 @@ assert.throws(
     }),
   /no adventure-spending mining decisions/,
 );
+
+const visibilityMetrics = evaluateCalibration(
+  100,
+  "ev-cluster",
+  "high",
+  { ore: 100000, gold: 100000, crystal: 100000, cave: 0 },
+  10000,
+  100,
+  makeCalibrationBoards(2, 12345, 0.496),
+  0.496,
+);
+assert.equal(visibilityMetrics.totalTurns > 10, true);
+assert.equal(visibilityMetrics.objectDetectionUses, Math.ceil(visibilityMetrics.totalTurns / 10));
 
 console.log("calibration checks passed");

@@ -4,6 +4,7 @@ export function calculateMiningValue<T>(
   values: ReadonlyMap<T, number>,
   costs: ReadonlyMap<T, number>,
   turns: number,
+  actualMeatSpent = 0,
 ) {
   const total = (entries: Iterable<readonly [T, number]>, prices: ReadonlyMap<T, number>) => {
     let value = 0;
@@ -11,11 +12,12 @@ export function calculateMiningValue<T>(
     return value;
   };
   const grossValue = total(collected, values);
-  const consumableCost = total(used, costs);
-  const netValue = grossValue - consumableCost;
+  const expectedCost = total(used, costs);
+  const netValue = grossValue - expectedCost;
   return {
     grossValue,
-    consumableCost,
+    expectedCost,
+    actualMeatSpent,
     netValue,
     valuePerAdventure: turns > 0 ? netValue / turns : null,
   };
