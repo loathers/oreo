@@ -1,119 +1,180 @@
-import { use } from "kolmafia";
-import { $item, get, have, tuple } from "libram";
+import { abort, equippedAmount, itemAmount, use } from "kolmafia";
+import { $effect, $item, ensureEffect, get, have, Mining } from "libram";
 
-import { Task } from "./engine.js";
-import * as Mining from "./mining.js";
-import { Mine } from "./mining.js";
-import {
-  assureHotResistance,
-  explain,
-  findStartOfLongestVein,
-  getAccessibleSparkles,
-  mineCoordinate,
-  prepareToMine,
-} from "./utils.js";
+import { args } from "./args.js";
+import { type MiningAccounting, recordItemUse, Task } from "./engine.js";
+import { parseMineLayout } from "./mine-layout.js";
+import { objectDetectionPotion, resolveObjectDetectionPrice, resolvePrice } from "./pricing.js";
+import { type Decision, type ResourceType, StrategyController } from "./strategy.js";
+import { assureHotResistance, explain, mineCoordinate, prepareToMine } from "./utils.js";
 
-export const MINING_TASKS: Task[] = [
-  {
-    name: "Acquire mining drill",
-    noCombat: true,
-    limit: { tries: 1 },
-    acquire: [
-      { item: $item`heat-resistant sheet metal` },
-      { item: $item`broken high-temperature mining drill` },
-    ],
-    do: () => {
-      use(1, $item`broken high-temperature mining drill`);
-    },
-    completed: () => have($item`high-temperature mining drill`),
-  },
-  {
-    name: "Acquire hippy medical kit",
-    noCombat: true,
-    limit: { tries: 1 },
-    acquire: [{ item: $item`hippy medical kit` }],
-    do: () => {},
-    completed: () => have($item`hippy medical kit`),
-  },
-  {
-    name: "Move to a new cavern having struck gold in this cavern",
-    after: ["Acquire mining drill"],
-    noCombat: true,
-    outfit: {
-      equip: [$item`high-temperature mining drill`, $item`hippy medical kit`],
-      modifier: "Hot Resistance",
-    },
-    ready: () => get("mineLayout6").includes("goldnugget"),
-    prepare: () => assureHotResistance(),
-    do: () => Mining.findNewCavern(Mine.VOLCANO),
-    completed: () => false,
-  },
-  {
-    name: "Move to new cavern having mined once with no sparkly targets",
-    after: ["Acquire mining drill"],
-    noCombat: true,
-    outfit: {
-      equip: [$item`high-temperature mining drill`, $item`hippy medical kit`],
-      modifier: "Hot Resistance",
-    },
-    ready: () => Mining.minedSpots(Mine.VOLCANO) >= 1 && getAccessibleSparkles().length === 0,
-    prepare: () => assureHotResistance(),
-    do: () => Mining.findNewCavern(Mine.VOLCANO),
-    completed: () => false,
-  },
-  {
-    name: "Mine a sparkly spot",
-    after: ["Acquire mining drill"],
-    noCombat: true,
-    outfit: {
-      equip: [$item`high-temperature mining drill`, $item`hippy medical kit`],
-      modifier: "Hot Resistance",
-    },
-    ready: () => getAccessibleSparkles().length > 0,
-    prepare: () => prepareToMine(),
-    do: () => {
-      // Mine a sparkly coordinate. We will mine all of these until we strike gold, so we might as well pick the first one.
-      mineCoordinate(getAccessibleSparkles()[0]);
-    },
-    completed: () => false,
-  },
-  {
-    name: "Mine a regular spot",
-    after: ["Acquire mining drill"],
-    noCombat: true,
-    outfit: () => ({
-      equip: [
-        $item`high-temperature mining drill`,
-        $item`hippy medical kit`,
-        ...(have($item`Xiblaxian holo-wrist-puter`) && !get("_holoWristCrystal")
-          ? [$item`Xiblaxian holo-wrist-puter`]
-          : []),
-      ],
-      modifier: "Hot Resistance",
-    }),
-    acquire: [
-      // Grab a minin' dynamite if it would save us compared to the value of an adventure here
-      { item: $item`minin' dynamite`, price: 3400, optional: true },
-    ],
-    ready: () => Mining.minedSpots(Mine.VOLCANO) === 0 && getAccessibleSparkles().length === 0,
-    prepare: () => prepareToMine(),
-    do: () => {
-      // Find a shiny spot in the second row we can aim for
-      const column = findStartOfLongestVein(Mining.getState(Mine.VOLCANO).slice(-12, -6));
+const gold = $item`1,970 carat gold`;
+const velvet = $item`unsmoothed velvet`;
+const crystal = $item`New Age healing crystal`;
+const dynamite = $item`minin' dynamite`;
+const sheetMetal = $item`heat-resistant sheet metal`;
+const brokenDrill = $item`broken high-temperature mining drill`;
+const miningDrill = $item`high-temperature mining drill`;
+const medicalKit = $item`hippy medical kit`;
 
-      // Either use that column or pick a random spot in the middle of the front row
-      // By picking a spot in the middle, an uncovered sparkly spot would itself
-      // provide the chance of finding two more spots
-      const coords = tuple(column >= 0 ? column + 1 : 2 + Math.floor(Math.random() * 4), 6);
+function minedResource(before: Record<ResourceType, number>): ResourceType | null {
+  if (itemAmount(gold) > before.gold) return "gold";
+  if (itemAmount(velvet) > before.ore) return "ore";
+  if (itemAmount(crystal) > before.crystal) return "crystal";
+  return null;
+}
 
-      if (column >= 0) {
-        explain(`No * in r6, longest vein of * starts at (${column + 1},5), aiming for that`);
-      } else {
-        explain(`No * in r6, picking random spot between (2,6) and (5,6)`);
-      }
+export function buildMiningTasks(
+  controller: StrategyController,
+  accounting: MiningAccounting,
+): Task[] {
+  const dynamitePrice = resolvePrice(args.dynamitePrice, dynamite);
+  accounting.costs.set(dynamite, dynamitePrice);
+  if (!have(miningDrill)) {
+    accounting.costs.set(sheetMetal, resolvePrice("mall", sheetMetal));
+    accounting.costs.set(brokenDrill, resolvePrice("mall", brokenDrill));
+  }
+  if (!have(medicalKit)) accounting.costs.set(medicalKit, resolvePrice("mall", medicalKit));
+  const detectionPotion = args.visibility === "high" ? objectDetectionPotion() : null;
+  if (detectionPotion) {
+    accounting.costs.set(detectionPotion, resolveObjectDetectionPrice(args.objectDetectionPrice));
+  }
+  controller.setDynamitePrice(dynamitePrice);
+  const miningOutfit = {
+    equip: [miningDrill, medicalKit],
+    modifier: "Hot Resistance",
+  };
+  const taskOutfit = args.useMiningOutfit ? miningOutfit : undefined;
+  let pendingDecision: Decision | null = null;
 
-      mineCoordinate(coords);
+  const selectDecision = () => {
+    if (pendingDecision) return pendingDecision;
+    controller.setDynamiteAvailable(
+      Math.max(itemAmount(dynamite), controller.shouldUseDynamite() ? 1 : 0),
+    );
+    controller.update(
+      Mining.getState(Mining.Mine.VOLCANO),
+      Mining.hasObjectDetection(Mining.Mine.VOLCANO),
+      parseMineLayout(get("mineLayout6")),
+    );
+    pendingDecision = controller.decide();
+    return pendingDecision;
+  };
+
+  const resetCavern = () => {
+    if (pendingDecision) explain(pendingDecision.reason);
+    Mining.findNewCavern(Mining.Mine.VOLCANO);
+    controller.reset();
+    pendingDecision = null;
+  };
+
+  return [
+    {
+      name: "Acquire mining drill",
+      noCombat: true,
+      limit: { tries: 1 },
+      acquire: [{ item: sheetMetal }, { item: brokenDrill }],
+      do: () => {
+        const drillBefore = itemAmount(miningDrill);
+        use(1, brokenDrill);
+        if (itemAmount(miningDrill) > drillBefore) {
+          recordItemUse(accounting, sheetMetal);
+          recordItemUse(accounting, brokenDrill);
+        }
+      },
+      completed: () => have(miningDrill),
     },
-    completed: () => false,
-  },
-];
+    {
+      name: "Acquire hippy medical kit",
+      noCombat: true,
+      limit: { tries: 1 },
+      acquire: [{ item: medicalKit }],
+      do: () => {},
+      completed: () => have(medicalKit),
+    },
+    {
+      name: "Move to a new cavern having struck gold in this cavern",
+      after: ["Acquire mining drill", "Acquire hippy medical kit"],
+      noCombat: true,
+      outfit: taskOutfit,
+      ready: () => controller.shouldResetAfterGold() && get("mineLayout6").includes("goldnugget"),
+      prepare: () => assureHotResistance(),
+      do: () => {
+        explain("Resetting after finding gold.");
+        pendingDecision = null;
+        resetCavern();
+      },
+      completed: () => false,
+    },
+    {
+      name: "Maintain Object Detection",
+      after: ["Acquire mining drill"],
+      noCombat: true,
+      ready: () =>
+        controller.needsObjectDetection() && !Mining.hasObjectDetection(Mining.Mine.VOLCANO),
+      do: () => {
+        ensureEffect($effect`Object Detection`);
+        // Refresh the state that was fetched before Object Detection revealed the whole cavern.
+        Mining.visit(Mining.Mine.VOLCANO);
+        if (detectionPotion) recordItemUse(accounting, detectionPotion);
+      },
+      completed: () => false,
+    },
+    {
+      name: "Move to a new cavern when the strategy has no worthwhile target",
+      after: ["Acquire mining drill", "Acquire hippy medical kit"],
+      noCombat: true,
+      outfit: taskOutfit,
+      ready: () => selectDecision().action === "reset",
+      prepare: () => assureHotResistance(),
+      do: () => resetCavern(),
+      completed: () => false,
+    },
+    {
+      name: "Mine the strategy's selected coordinate",
+      after: ["Acquire mining drill", "Acquire hippy medical kit"],
+      noCombat: true,
+      outfit: args.useMiningOutfit
+        ? () => ({
+            ...miningOutfit,
+            equip: [
+              ...miningOutfit.equip,
+              ...(have($item`Xiblaxian holo-wrist-puter`) && !get("_holoWristCrystal")
+                ? [$item`Xiblaxian holo-wrist-puter`]
+                : []),
+            ],
+          })
+        : undefined,
+      acquire: () =>
+        controller.shouldUseDynamite() ? [{ item: dynamite, price: dynamitePrice }] : [],
+      ready: () => selectDecision().action === "mine",
+      prepare: () => {
+        if (!args.useMiningOutfit && equippedAmount($item`high-temperature mining drill`) === 0) {
+          abort("The current outfit must include a high-temperature mining drill.");
+        }
+        prepareToMine();
+      },
+      do: () => {
+        const decision = pendingDecision;
+        if (!decision || decision.action !== "mine") {
+          throw new Error("Mining task ran without a selected coordinate.");
+        }
+        explain(decision.reason);
+
+        const before = {
+          ore: itemAmount(velvet),
+          gold: itemAmount(gold),
+          crystal: itemAmount(crystal),
+          cave: 0,
+        };
+        const dynamiteBefore = itemAmount(dynamite);
+        mineCoordinate(decision.coordinate);
+        const dynamiteUsed = dynamiteBefore - itemAmount(dynamite);
+        if (dynamiteUsed > 0) recordItemUse(accounting, dynamite, dynamiteUsed);
+        controller.recordMine(decision.coordinate, minedResource(before));
+        pendingDecision = null;
+      },
+      completed: () => false,
+    },
+  ];
+}

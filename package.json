@@ -8,6 +8,7 @@
     "build": "rollup -c rollup.config.ts --configPlugin @rollup/plugin-typescript",
     "format": "eslint src --fix --ext .ts && NODE_OPTIONS=\"--experimental-strip-types\" prettier --write .",
     "lint": "eslint src --ext .ts &&  NODE_OPTIONS=\"--experimental-strip-types\" prettier --check .",
+    "test": "node --experimental-strip-types test/legacy-strategy.test.ts && node --experimental-strip-types test/strategy.test.ts && node --experimental-strip-types test/calibrate.test.ts",
     "watch": "rollup -c rollup.config.ts --configPlugin @rollup/plugin-typescript --watch",
     "install-mafia": "create-kolmafia-script --install"
   },

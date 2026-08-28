@@ -2049,11 +2049,11 @@ __metadata:
   linkType: hard
 
 "@types/node@npm:^25.9.1":
-  version: 25.9.1
-  resolution: "@types/node@npm:25.9.1"
+  version: 25.9.5
+  resolution: "@types/node@npm:25.9.5"
   dependencies:
     undici-types: "npm:>=7.24.0 <7.24.7"
-  checksum: 10c0/9a04682842bebbcf21a1779dfeab9aa733d7bd7bbc0a0edb641ab3a9a3d43eac543225acf669c334f458f1956443ebc072bc3c72840c543b8b356cab5c82d456
+  checksum: 10c0/addbfe55f14d6a7f149a8796c2fca68463ac6caf911c623f552d07385691d36c0669a9c38724350d0e958131827d59a63c18781e753dede8113a903dd62b7932
   languageName: node
   linkType: hard
 
@@ -2558,9 +2558,9 @@ __metadata:
   linkType: hard
 
 "core-js@npm:^3.47.0":
-  version: 3.47.0
-  resolution: "core-js@npm:3.47.0"
-  checksum: 10c0/9b1a7088b7c660c7b8f1d4c90bb1816a8d5352ebdcb7bc742e3a0e4eb803316b5aa17bacb8769522342196351a5430178f46914644f2bfdb94ce0ced3c7fd523
+  version: 3.50.0
+  resolution: "core-js@npm:3.50.0"
+  checksum: 10c0/1bfcfb1dbdf45b0b1428a9fdcb03697d1fc52c7e9bc336f804a86ff2c2705a301dca7d9d6636d09d49d60298183273b9321681baeaf330c78db5393bc73f3f6a
   languageName: node
   linkType: hard
 
@@ -3483,14 +3483,14 @@ __metadata:
   linkType: hard
 
 "libram@npm:^0.11.22":
-  version: 0.11.22
-  resolution: "libram@npm:0.11.22"
+  version: 0.11.24
+  resolution: "libram@npm:0.11.24"
   dependencies:
     core-js: "npm:^3.47.0"
     entities: "npm:^7.0.0"
   peerDependencies:
     kolmafia: ^5.28100.0
-  checksum: 10c0/b683a3a1d64ef37a1ff7e01caca0547aea770bd8c79086f5438c5ddea58eb959b105655e67d8c7332a0c85fd711ea6721f19a5ab27dcdf959da922fb9b5aedc2
+  checksum: 10c0/1f0f629813c8102f8a675c1098b72788d68aa6da915f1c4fdfb71eadd467e227ed30f73a2e18ff5057d4f82cc37a803391bba2065b367671dd6d375ccdb2ce6e
   languageName: node
   linkType: hard
 

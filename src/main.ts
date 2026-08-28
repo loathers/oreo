@@ -1,49 +1,187 @@
 import { Args, getTasks, Quest } from "grimoire-kolmafia";
 import {
-  canAdventure,
+  abort,
   inebrietyLimit,
   myAdventures,
   myInebriety,
+  print,
   totalTurnsPlayed,
 } from "kolmafia";
-import { $location, sinceKolmafiaRevision } from "libram";
+import { $item, get, Mining, sinceKolmafiaRevision } from "libram";
 
-import { args } from "./args.js";
-import { MiningEngine, Task } from "./engine.js";
-import { countFreeMines, Mine, visit } from "./mining.js";
-import { MINING_TASKS } from "./tasks.js";
+import { args, parsePrice } from "./args.js";
+import { calibrate } from "./calibrate.js";
+import { type MiningAccounting, MiningEngine, Task } from "./engine.js";
+import { resolveObjectDetectionPrice, resolvePrice } from "./pricing.js";
+import {
+  STRATEGIES,
+  StrategyController,
+  StrategyName,
+  StrategyValues,
+  VISIBILITIES,
+  VisibilityMode,
+} from "./strategy.js";
+import { buildMiningTasks } from "./tasks.js";
+import { printError } from "./utils.js";
 
-export function main(argstring = "") {
-  sinceKolmafiaRevision(28420);
-
-  Args.fill(args, argstring);
-
-  if (args.help) {
-    Args.showHelp(args);
-    return;
+function runCalibration(values: StrategyValues): number {
+  if (args.strategy !== "ev" && args.strategy !== "ev-cluster") {
+    abort("Calibration is only available for the ev and ev-cluster strategies.");
   }
+  if (
+    args.calibrationMin <= 0 ||
+    args.calibrationMax <= args.calibrationMin ||
+    args.calibrationStep <= 0 ||
+    args.calibrationFineSteps < 0 ||
+    !Number.isInteger(args.calibrationBoards) ||
+    args.calibrationBoards <= 0
+  ) {
+    abort(
+      "Calibration requires 0 < min < max, step > 0, fineSteps >= 0, " +
+        "and positive integer boards.",
+    );
+  }
+  print(
+    `Calibrating ${args.strategy}/${args.visibility} on ${args.calibrationBoards} synthetic mines...`,
+    "blue",
+  );
+  const dynamitePrice = resolvePrice(args.dynamitePrice, $item`minin' dynamite`);
+  const objectDetectionPrice =
+    args.visibility === "high" ? resolveObjectDetectionPrice(args.objectDetectionPrice) : 0;
+  const result = calibrate({
+    strategy: args.strategy,
+    visibility: args.visibility as VisibilityMode,
+    values,
+    dynamitePrice,
+    objectDetectionPrice,
+    min: args.calibrationMin,
+    max: args.calibrationMax,
+    step: args.calibrationStep,
+    fineSteps: args.calibrationFineSteps,
+    boardCount: args.calibrationBoards,
+    seed: args.calibrationSeed,
+    secondGoldChance: args.secondGoldChance,
+    onProgress: (completed, total, lambda) =>
+      print(
+        `Calibration ${completed}/${total} (${Math.round((100 * completed) / total)}%): ` +
+          `lambda=${lambda}`,
+        "blue",
+      ),
+  });
+  print(
+    `Calibrated ${args.strategy}/${args.visibility} on ${result.sampleSize} synthetic mines: ` +
+      `lambda=${result.lambda}, rate=${result.rate.toFixed(1)}`,
+    "blue",
+  );
+  print(
+    `Use: oreo strategy=${args.strategy} visibility=${args.visibility} ` +
+      `lambda=${result.lambda} oreValue=${values.ore} goldValue=${values.gold} ` +
+      `crystalValue=${values.crystal} dynamitePrice=${dynamitePrice} ` +
+      `objectDetectionPrice=${objectDetectionPrice} secondGoldChance=${args.secondGoldChance}`,
+    "blue",
+  );
+  return result.lambda;
+}
 
+function runMining(values: StrategyValues, lambda: number): void {
   const stopAtTurn = totalTurnsPlayed() + args.turns;
 
-  // Make sure the mine state is up to date
-  visit(Mine.VOLCANO);
+  if (!get("hotAirportAlways") && !get("_hotAirportToday")) {
+    abort("You do not have access to That 70s Volcano.");
+  }
 
+  // Make sure the mine state is up to date
+  Mining.visit(Mining.Mine.VOLCANO);
+  if (Mining.getState(Mining.Mine.VOLCANO).length !== 36) {
+    abort("Could not access the Velvet / Gold Mine.");
+  }
+
+  const accounting: MiningAccounting = {
+    values: new Map([
+      [$item`unsmoothed velvet`, values.ore],
+      [$item`1,970 carat gold`, values.gold],
+      [$item`New Age healing crystal`, values.crystal],
+    ]),
+    costs: new Map(),
+    used: new Map(),
+    actualMeatSpent: 0,
+  };
   const quest: Quest<Task> = {
-    name: "Oreo",
+    name: "Goldmine",
     ready: () =>
-      // Indicative of access to the 70s Volcano
-      canAdventure($location`The SMOOCH Army HQ`) &&
-      myInebriety() <= inebrietyLimit() &&
-      (myAdventures() > 0 || countFreeMines() > 0),
-    completed: () => totalTurnsPlayed() >= stopAtTurn && countFreeMines() === 0,
-    tasks: [...MINING_TASKS],
+      myInebriety() <= inebrietyLimit() && (myAdventures() > 0 || Mining.countFreeMines() > 0),
+    completed: () => totalTurnsPlayed() >= stopAtTurn && Mining.countFreeMines() === 0,
+    tasks: buildMiningTasks(
+      new StrategyController(
+        args.strategy as StrategyName,
+        args.visibility as VisibilityMode,
+        lambda,
+        values,
+        args.secondGoldChance,
+        printError,
+      ),
+      accounting,
+    ),
   };
 
-  const engine = new MiningEngine(getTasks([quest]));
-
+  const engine = new MiningEngine(getTasks([quest]), accounting);
   try {
     engine.run();
   } finally {
     engine.destruct();
   }
+}
+
+export function main(argstring = "") {
+  sinceKolmafiaRevision(28420);
+
+  const [command, ...rest] = argstring.trim().split(/\s+/);
+  const calibrationOnly = command.toLowerCase() === "calibrate";
+  Args.fill(args, calibrationOnly ? rest.join(" ") : argstring);
+
+  if (args.help) {
+    Args.showHelp(args);
+    return;
+  }
+  if (!STRATEGIES.includes(args.strategy as StrategyName)) {
+    abort(`Unknown strategy "${args.strategy}". Choose: ${STRATEGIES.join(", ")}.`);
+  }
+  if (!VISIBILITIES.includes(args.visibility as VisibilityMode)) {
+    abort(`Unknown visibility "${args.visibility}". Choose: ${VISIBILITIES.join(", ")}.`);
+  }
+  if (args.lambda < 0) abort("lambda must be zero (automatic) or positive.");
+  if (
+    !Number.isFinite(args.secondGoldChance) ||
+    args.secondGoldChance < 0 ||
+    args.secondGoldChance > 1
+  ) {
+    abort("secondGoldChance must be between zero and one.");
+  }
+  if (parsePrice(args.objectDetectionPrice) === null) {
+    abort('objectDetectionPrice must be non-negative or "mall".');
+  }
+  if (parsePrice(args.dynamitePrice) === null) {
+    abort('dynamitePrice must be non-negative or "mall".');
+  }
+  for (const [name, value] of [
+    ["oreValue", args.oreValue],
+    ["goldValue", args.goldValue],
+    ["crystalValue", args.crystalValue],
+  ]) {
+    if (parsePrice(value) === null) abort(`${name} must be non-negative or "mall".`);
+  }
+
+  const values: StrategyValues = {
+    ore: resolvePrice(args.oreValue, $item`unsmoothed velvet`),
+    gold: resolvePrice(args.goldValue, $item`1,970 carat gold`),
+    crystal: resolvePrice(args.crystalValue, $item`New Age healing crystal`),
+    cave: 0,
+  };
+  let lambda = args.lambda;
+  if (calibrationOnly || args.calibrate) {
+    lambda = runCalibration(values);
+    if (calibrationOnly) return;
+    print(`Continuing with calibrated lambda=${lambda}.`, "blue");
+  }
+  runMining(values, lambda);
 }

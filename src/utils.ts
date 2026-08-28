@@ -1,9 +1,8 @@
 import { abort, isDarkMode, myHp, numericModifier, print, printHtml, restoreHp } from "kolmafia";
-import { $modifier } from "libram";
+import { $modifier, Mining } from "libram";
 
 import { args } from "./args.js";
-import * as Mining from "./mining.js";
-import { Mine, type MiningCoordinate } from "./mining.js";
+import type { MiningCoordinate } from "./strategy.js";
 
 export function printHighlight(message: string): void {
   const color = isDarkMode() ? "yellow" : "blue";
@@ -30,7 +29,7 @@ export function assureHotResistance() {
 export function prepareToMine() {
   assureHotResistance();
 
-  const minHp = Mining.caveInCost(Mine.VOLCANO);
+  const minHp = Mining.caveInCost(Mining.Mine.VOLCANO);
   if (args.survive && myHp() < minHp) {
     const hpRestore = 2 * minHp + myHp();
     if (!restoreHp(hpRestore)) abort("Could not restore enough HP to survive the cave-in.");
@@ -41,25 +40,13 @@ export function prepareToMine() {
 
 export function mineCoordinate(coords: MiningCoordinate) {
   explain(
-    `\n${Mining.getAsMatrix(Mine.VOLCANO)
+    `\n${Mining.getAsMatrix(Mining.Mine.VOLCANO)
       .map((row) => row.join(""))
       .join("\n")}\nPicked (${coords.join(",")})`,
   );
 
-  Mining.mineCoordinate(Mine.VOLCANO, coords);
-}
-
-export function getAccessibleSparkles() {
-  return Mining.getAccessibleSparkles(Mine.VOLCANO).filter(([, y]) => [5, 6].includes(y));
-}
-
-export function findStartOfLongestVein(layout: string) {
-  return (
-    Array(layout.length)
-      .fill(0)
-      .map((_, i) => i)
-      .filter((i) => layout[i] === "*")
-      .map((i) => ({ i, size: layout.slice(i).match(/^(\*+)/)?.[1].length ?? 0 }))
-      .sort((a, b) => b.size - a.size)[0]?.i ?? -1
-  );
+  if (!Mining.isValidCoordinate(coords)) {
+    throw new Error(`Invalid mining coordinate: ${coords.join(",")}`);
+  }
+  return Mining.mineCoordinate(Mining.Mine.VOLCANO, coords);
 }
