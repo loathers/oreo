@@ -114,6 +114,8 @@ export function buildMiningTasks(
         controller.needsObjectDetection() && !Mining.hasObjectDetection(Mining.Mine.VOLCANO),
       do: () => {
         ensureEffect($effect`Object Detection`);
+        // Refresh the state that was fetched before Object Detection revealed the whole cavern.
+        Mining.visit(Mining.Mine.VOLCANO);
         if (detectionPotion) recordItemUse(accounting, detectionPotion);
       },
       completed: () => false,
