@@ -35,7 +35,6 @@ export function assureHotResistance() {
   }
 }
 
-// The mine page only renders - and so mafia only records mineState6 - while the drill is worn.
 function assureDrill() {
   if (!args.useMiningOutfit && equippedAmount($item`high-temperature mining drill`) === 0) {
     abort("The current outfit must include a high-temperature mining drill.");

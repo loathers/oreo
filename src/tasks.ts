@@ -53,7 +53,6 @@ export function buildMiningTasks(
   };
   const taskOutfit = args.useMiningOutfit ? miningOutfit : undefined;
   let pendingDecision: Decision | null = null;
-  // mineState6 persists between sessions, so a stale value cannot stand in for this.
   let mineVisited = false;
 
   const selectDecision = () => {
@@ -143,7 +142,6 @@ export function buildMiningTasks(
                 abort(`Using ${detectionPotion} did not grant Object Detection.`);
               }
               recordItemUse(accounting, detectionPotion);
-              // Refresh the state fetched before Object Detection revealed the whole cavern.
               visitMine();
             },
             completed: () => false,
