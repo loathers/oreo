@@ -1,5 +1,14 @@
-import { abort, isDarkMode, myHp, numericModifier, print, printHtml, restoreHp } from "kolmafia";
-import { $modifier, Mining } from "libram";
+import {
+  abort,
+  equippedAmount,
+  isDarkMode,
+  myHp,
+  numericModifier,
+  print,
+  printHtml,
+  restoreHp,
+} from "kolmafia";
+import { $item, $modifier, Mining } from "libram";
 
 import { args } from "./args.js";
 import type { MiningCoordinate } from "./strategy.js";
@@ -26,7 +35,33 @@ export function assureHotResistance() {
   }
 }
 
+// The mine page only renders - and so mafia only records mineState6 - while the drill is worn.
+function assureDrill() {
+  if (!args.useMiningOutfit && equippedAmount($item`high-temperature mining drill`) === 0) {
+    abort("The current outfit must include a high-temperature mining drill.");
+  }
+}
+
+function assureMineState() {
+  if (Mining.getState(Mining.Mine.VOLCANO).length !== 36) {
+    abort("Could not read the Velvet / Gold Mine.");
+  }
+}
+
+export function visitMine() {
+  assureDrill();
+  Mining.visit(Mining.Mine.VOLCANO);
+  assureMineState();
+}
+
+export function findNewCavern() {
+  assureDrill();
+  Mining.findNewCavern(Mining.Mine.VOLCANO);
+  assureMineState();
+}
+
 export function prepareToMine() {
+  assureDrill();
   assureHotResistance();
 
   const minHp = Mining.caveInCost(Mining.Mine.VOLCANO);
