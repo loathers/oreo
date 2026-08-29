@@ -6,14 +6,7 @@ import { type MiningAccounting, recordItemUse, Task } from "./engine.js";
 import { parseMineLayout } from "./mine-layout.js";
 import { objectDetectionPotion, resolveObjectDetectionPrice, resolvePrice } from "./pricing.js";
 import { type Decision, type ResourceType, StrategyController } from "./strategy.js";
-import {
-  assureHotResistance,
-  explain,
-  findNewCavern,
-  mineCoordinate,
-  prepareToMine,
-  visitMine,
-} from "./utils.js";
+import { explain, findNewCavern, mineCoordinate, prepareToMine, visitMine } from "./utils.js";
 
 const gold = $item`1,970 carat gold`;
 const velvet = $item`unsmoothed velvet`;
@@ -105,7 +98,6 @@ export function buildMiningTasks(
       after: ["Acquire mining drill", "Acquire hippy medical kit"],
       noCombat: true,
       outfit: taskOutfit,
-      prepare: assureHotResistance,
       do: () => {
         visitMine();
         mineVisited = true;
@@ -118,7 +110,6 @@ export function buildMiningTasks(
       noCombat: true,
       outfit: taskOutfit,
       ready: () => controller.shouldResetAfterGold() && get("mineLayout6").includes("goldnugget"),
-      prepare: assureHotResistance,
       do: () => {
         explain("Resetting after finding gold.");
         pendingDecision = null;
@@ -154,7 +145,6 @@ export function buildMiningTasks(
       noCombat: true,
       outfit: taskOutfit,
       ready: () => selectDecision().action === "reset",
-      prepare: assureHotResistance,
       do: resetCavern,
       completed: () => false,
     },

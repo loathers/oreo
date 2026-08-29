@@ -27,7 +27,7 @@ export function explain(message: string): void {
   printHtml(`<pre color="green">[EXPLAIN] ${message}</pre>`);
 }
 
-export function assureHotResistance() {
+function assureHotResistance() {
   if (numericModifier($modifier`Hot Resistance`) < 15) {
     abort(
       `More hot resistance needed (you have ${numericModifier($modifier`Hot Resistance`)}, you need 15).`,
@@ -49,12 +49,14 @@ function assureMineState() {
 
 export function visitMine() {
   assureDrill();
+  assureHotResistance();
   Mining.visit(Mining.Mine.VOLCANO);
   assureMineState();
 }
 
 export function findNewCavern() {
   assureDrill();
+  assureHotResistance();
   Mining.findNewCavern(Mining.Mine.VOLCANO);
   assureMineState();
 }
