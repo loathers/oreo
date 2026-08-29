@@ -90,12 +90,6 @@ function runMining(values: StrategyValues, lambda: number): void {
     abort("You do not have access to That 70s Volcano.");
   }
 
-  // Make sure the mine state is up to date
-  Mining.visit(Mining.Mine.VOLCANO);
-  if (Mining.getState(Mining.Mine.VOLCANO).length !== 36) {
-    abort("Could not access the Velvet / Gold Mine.");
-  }
-
   const accounting: MiningAccounting = {
     values: new Map([
       [$item`unsmoothed velvet`, values.ore],

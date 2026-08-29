@@ -1,12 +1,12 @@
-import { abort, equippedAmount, itemAmount, use } from "kolmafia";
-import { $effect, $item, ensureEffect, get, have, Mining } from "libram";
+import { abort, itemAmount, use } from "kolmafia";
+import { $item, get, have, Mining } from "libram";
 
 import { args } from "./args.js";
 import { type MiningAccounting, recordItemUse, Task } from "./engine.js";
 import { parseMineLayout } from "./mine-layout.js";
 import { objectDetectionPotion, resolveObjectDetectionPrice, resolvePrice } from "./pricing.js";
 import { type Decision, type ResourceType, StrategyController } from "./strategy.js";
-import { assureHotResistance, explain, mineCoordinate, prepareToMine } from "./utils.js";
+import { explain, findNewCavern, mineCoordinate, prepareToMine, visitMine } from "./utils.js";
 
 const gold = $item`1,970 carat gold`;
 const velvet = $item`unsmoothed velvet`;
@@ -46,6 +46,7 @@ export function buildMiningTasks(
   };
   const taskOutfit = args.useMiningOutfit ? miningOutfit : undefined;
   let pendingDecision: Decision | null = null;
+  let mineVisited = false;
 
   const selectDecision = () => {
     if (pendingDecision) return pendingDecision;
@@ -63,7 +64,7 @@ export function buildMiningTasks(
 
   const resetCavern = () => {
     if (pendingDecision) explain(pendingDecision.reason);
-    Mining.findNewCavern(Mining.Mine.VOLCANO);
+    findNewCavern();
     controller.reset();
     pendingDecision = null;
   };
@@ -93,12 +94,22 @@ export function buildMiningTasks(
       completed: () => have(medicalKit),
     },
     {
-      name: "Move to a new cavern having struck gold in this cavern",
+      name: "Visit the mine",
       after: ["Acquire mining drill", "Acquire hippy medical kit"],
       noCombat: true,
       outfit: taskOutfit,
+      do: () => {
+        visitMine();
+        mineVisited = true;
+      },
+      completed: () => mineVisited,
+    },
+    {
+      name: "Move to a new cavern having struck gold in this cavern",
+      after: ["Visit the mine"],
+      noCombat: true,
+      outfit: taskOutfit,
       ready: () => controller.shouldResetAfterGold() && get("mineLayout6").includes("goldnugget"),
-      prepare: () => assureHotResistance(),
       do: () => {
         explain("Resetting after finding gold.");
         pendingDecision = null;
@@ -106,33 +117,40 @@ export function buildMiningTasks(
       },
       completed: () => false,
     },
-    {
-      name: "Maintain Object Detection",
-      after: ["Acquire mining drill"],
-      noCombat: true,
-      ready: () =>
-        controller.needsObjectDetection() && !Mining.hasObjectDetection(Mining.Mine.VOLCANO),
-      do: () => {
-        ensureEffect($effect`Object Detection`);
-        // Refresh the state that was fetched before Object Detection revealed the whole cavern.
-        Mining.visit(Mining.Mine.VOLCANO);
-        if (detectionPotion) recordItemUse(accounting, detectionPotion);
-      },
-      completed: () => false,
-    },
+    ...(detectionPotion
+      ? [
+          {
+            name: "Maintain Object Detection",
+            after: ["Visit the mine"],
+            noCombat: true,
+            outfit: taskOutfit,
+            ready: () =>
+              controller.needsObjectDetection() && !Mining.hasObjectDetection(Mining.Mine.VOLCANO),
+            acquire: [{ item: detectionPotion, price: accounting.costs.get(detectionPotion) }],
+            do: () => {
+              use(1, detectionPotion);
+              if (!Mining.hasObjectDetection(Mining.Mine.VOLCANO)) {
+                abort(`Using ${detectionPotion} did not grant Object Detection.`);
+              }
+              recordItemUse(accounting, detectionPotion);
+              visitMine();
+            },
+            completed: () => false,
+          },
+        ]
+      : []),
     {
       name: "Move to a new cavern when the strategy has no worthwhile target",
-      after: ["Acquire mining drill", "Acquire hippy medical kit"],
+      after: ["Visit the mine"],
       noCombat: true,
       outfit: taskOutfit,
       ready: () => selectDecision().action === "reset",
-      prepare: () => assureHotResistance(),
-      do: () => resetCavern(),
+      do: resetCavern,
       completed: () => false,
     },
     {
       name: "Mine the strategy's selected coordinate",
-      after: ["Acquire mining drill", "Acquire hippy medical kit"],
+      after: ["Visit the mine"],
       noCombat: true,
       outfit: args.useMiningOutfit
         ? () => ({
@@ -148,12 +166,7 @@ export function buildMiningTasks(
       acquire: () =>
         controller.shouldUseDynamite() ? [{ item: dynamite, price: dynamitePrice }] : [],
       ready: () => selectDecision().action === "mine",
-      prepare: () => {
-        if (!args.useMiningOutfit && equippedAmount($item`high-temperature mining drill`) === 0) {
-          abort("The current outfit must include a high-temperature mining drill.");
-        }
-        prepareToMine();
-      },
+      prepare: prepareToMine,
       do: () => {
         const decision = pendingDecision;
         if (!decision || decision.action !== "mine") {
