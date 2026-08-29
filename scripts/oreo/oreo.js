@@ -1904,7 +1904,7 @@ createSingleConstant(kolmafia.Thrall, kolmafia.toThrall);
  */
 createPluralConstant(kolmafia.Thrall);
 
-var _templateObject$8, _templateObject10$4, _templateObject11$3, _templateObject12$3, _templateObject13$3, _templateObject14$3, _templateObject15$3, _templateObject16$3, _templateObject17$3, _templateObject18$3, _templateObject19$3, _templateObject20$3, _templateObject21$3, _templateObject22$3, _templateObject23$3, _templateObject24$3, _templateObject25$3, _templateObject26$3, _templateObject27$3, _templateObject28$3, _templateObject29$3, _templateObject30$3, _templateObject31$3, _templateObject32$2, _templateObject33$2, _templateObject34$2, _templateObject35$2, _templateObject48$2, _templateObject49$1, _templateObject50$1, _templateObject51$1, _templateObject52$1, _templateObject53$1;
+var _templateObject$8, _templateObject10$3, _templateObject11$3, _templateObject12$3, _templateObject13$3, _templateObject14$3, _templateObject15$3, _templateObject16$3, _templateObject17$3, _templateObject18$3, _templateObject19$3, _templateObject20$3, _templateObject21$3, _templateObject22$3, _templateObject23$3, _templateObject24$3, _templateObject25$3, _templateObject26$3, _templateObject27$3, _templateObject28$3, _templateObject29$3, _templateObject30$3, _templateObject31$3, _templateObject32$2, _templateObject33$2, _templateObject34$2, _templateObject35$2, _templateObject48$2, _templateObject49$1, _templateObject50$1, _templateObject51$1, _templateObject52$1, _templateObject53$1;
 /**
  * Determine whether the Skill or Effect provided is an Accordion Thief song
  *
@@ -2043,7 +2043,7 @@ function ensureEffect(ef) {
     }
   }
 }
-var holidayWanderers = new Map([["El Dia De Los Muertos Borrachos", $monsters(_templateObject10$4 || (_templateObject10$4 = _taggedTemplateLiteral(["Novia Cad\xE1ver, Novio Cad\xE1ver, Padre Cad\xE1ver, Persona Inocente Cad\xE1ver"])))], ["Feast of Boris", $monsters(_templateObject11$3 || (_templateObject11$3 = _taggedTemplateLiteral(["Candied Yam Golem, Malevolent Tofurkey, Possessed Can of Cranberry Sauce, Stuffing Golem"])))], ["Talk Like a Pirate Day", $monsters(_templateObject12$3 || (_templateObject12$3 = _taggedTemplateLiteral(["ambulatory pirate, migratory pirate, peripatetic pirate"])))]]);
+var holidayWanderers = new Map([["El Dia De Los Muertos Borrachos", $monsters(_templateObject10$3 || (_templateObject10$3 = _taggedTemplateLiteral(["Novia Cad\xE1ver, Novio Cad\xE1ver, Padre Cad\xE1ver, Persona Inocente Cad\xE1ver"])))], ["Feast of Boris", $monsters(_templateObject11$3 || (_templateObject11$3 = _taggedTemplateLiteral(["Candied Yam Golem, Malevolent Tofurkey, Possessed Can of Cranberry Sauce, Stuffing Golem"])))], ["Talk Like a Pirate Day", $monsters(_templateObject12$3 || (_templateObject12$3 = _taggedTemplateLiteral(["ambulatory pirate, migratory pirate, peripatetic pirate"])))]]);
 /**
  * Get today's holiday wanderers
  *
@@ -2875,7 +2875,7 @@ _defineProperty(Macro, "SAVED_MACRO_PROPERTY", "libram_savedMacro");
 _defineProperty(Macro, "cachedMacroIds", new Map());
 _defineProperty(Macro, "cachedAutoAttacks", new Map());
 
-var _templateObject$7, _templateObject2$6, _templateObject3$5, _templateObject4$5, _templateObject5$5, _templateObject6$5, _templateObject7$5, _templateObject8$4, _templateObject9$3, _templateObject0$3, _templateObject1$3, _templateObject10$3, _templateObject11$2, _templateObject12$2, _templateObject13$2, _templateObject14$2, _templateObject15$2, _templateObject16$2, _templateObject17$2, _templateObject18$2, _templateObject19$2, _templateObject20$2, _templateObject21$2, _templateObject22$2, _templateObject23$2, _templateObject24$2, _templateObject25$2, _templateObject26$2, _templateObject27$2, _templateObject28$2, _templateObject29$2, _templateObject30$2, _templateObject31$2, _templateObject32$1, _templateObject33$1, _templateObject34$1, _templateObject35$1, _templateObject36$1, _templateObject37$1, _templateObject38$1, _templateObject39$1, _templateObject40$1, _templateObject41$1, _templateObject42$1, _templateObject43$1, _templateObject44$1, _templateObject45$1, _templateObject46$1, _templateObject47$1, _templateObject48$1;
+var _templateObject$7, _templateObject2$6, _templateObject3$6, _templateObject4$5, _templateObject5$5, _templateObject6$5, _templateObject7$5, _templateObject8$4, _templateObject9$3, _templateObject0$3, _templateObject1$2, _templateObject10$2, _templateObject11$2, _templateObject12$2, _templateObject13$2, _templateObject14$2, _templateObject15$2, _templateObject16$2, _templateObject17$2, _templateObject18$2, _templateObject19$2, _templateObject20$2, _templateObject21$2, _templateObject22$2, _templateObject23$2, _templateObject24$2, _templateObject25$2, _templateObject26$2, _templateObject27$2, _templateObject28$2, _templateObject29$2, _templateObject30$2, _templateObject31$2, _templateObject32$1, _templateObject33$1, _templateObject34$1, _templateObject35$1, _templateObject36$1, _templateObject37$1, _templateObject38$1, _templateObject39$1, _templateObject40$1, _templateObject41$1, _templateObject42$1, _templateObject43$1, _templateObject44$1, _templateObject45$1, _templateObject46$1, _templateObject47$1, _templateObject48$1;
 function toMaximizerName(_ref) {
   var name = _ref.name,
     id = _ref.id;
@@ -2923,7 +2923,7 @@ var modeableCommands$1 = ["backupcamera", "umbrella", "snowsuit", "edpiece", "re
 var modeableItems = {
   backupcamera: $item(_templateObject$7 || (_templateObject$7 = _taggedTemplateLiteral(["backup camera"]))),
   umbrella: $item(_templateObject2$6 || (_templateObject2$6 = _taggedTemplateLiteral(["unbreakable umbrella"]))),
-  snowsuit: $item(_templateObject3$5 || (_templateObject3$5 = _taggedTemplateLiteral(["Snow Suit"]))),
+  snowsuit: $item(_templateObject3$6 || (_templateObject3$6 = _taggedTemplateLiteral(["Snow Suit"]))),
   edpiece: $item(_templateObject4$5 || (_templateObject4$5 = _taggedTemplateLiteral(["The Crown of Ed the Undying"]))),
   retrocape: $item(_templateObject5$5 || (_templateObject5$5 = _taggedTemplateLiteral(["unwrapped knock-off retro superhero cape"]))),
   parka: $item(_templateObject6$5 || (_templateObject6$5 = _taggedTemplateLiteral(["Jurassic Parka"]))),
@@ -3126,7 +3126,7 @@ function applyCached(entry, options) {
       kolmafia.outfit(outfitName);
     }
     var familiarEquip = entry.equipment.get($slot(_templateObject0$3 || (_templateObject0$3 = _taggedTemplateLiteral(["familiar"]))));
-    if (familiarEquip) kolmafia.equip($slot(_templateObject1$3 || (_templateObject1$3 = _taggedTemplateLiteral(["familiar"]))), familiarEquip);
+    if (familiarEquip) kolmafia.equip($slot(_templateObject1$2 || (_templateObject1$2 = _taggedTemplateLiteral(["familiar"]))), familiarEquip);
   } else {
     var _iterator3 = _createForOfIteratorHelper(entry.equipment),
       _step3;
@@ -3150,7 +3150,7 @@ function applyCached(entry, options) {
       saveOutfit(_outfitName);
     }
   }
-  if (kolmafia.equippedAmount($item(_templateObject10$3 || (_templateObject10$3 = _taggedTemplateLiteral(["Crown of Thrones"])))) > 0 && entry.rider.get($item(_templateObject11$2 || (_templateObject11$2 = _taggedTemplateLiteral(["Crown of Thrones"]))))) {
+  if (kolmafia.equippedAmount($item(_templateObject10$2 || (_templateObject10$2 = _taggedTemplateLiteral(["Crown of Thrones"])))) > 0 && entry.rider.get($item(_templateObject11$2 || (_templateObject11$2 = _taggedTemplateLiteral(["Crown of Thrones"]))))) {
     kolmafia.enthroneFamiliar(entry.rider.get($item(_templateObject12$2 || (_templateObject12$2 = _taggedTemplateLiteral(["Crown of Thrones"])))) || $familiar.none);
   }
   if (kolmafia.equippedAmount($item(_templateObject13$2 || (_templateObject13$2 = _taggedTemplateLiteral(["Buddy Bjorn"])))) > 0 && entry.rider.get($item(_templateObject14$2 || (_templateObject14$2 = _taggedTemplateLiteral(["Buddy Bjorn"]))))) {
@@ -3448,7 +3448,7 @@ var Requirement = /*#__PURE__*/function () {
   }]);
 }();
 
-var _templateObject$6, _templateObject2$5, _templateObject3$4, _templateObject4$4, _templateObject5$4, _templateObject6$4, _templateObject7$4, _templateObject8$3;
+var _templateObject$6, _templateObject2$5, _templateObject3$5, _templateObject4$4, _templateObject5$4, _templateObject6$4, _templateObject7$4, _templateObject8$3;
 /**
  * Mines in the Kingdom of Loathing
  */
@@ -3497,7 +3497,7 @@ function caveInCost(mine) {
     case Mine.ITZNOTYERZITZ:
     case Mine.GUMMI:
     case Mine.CRIMBONIUM:
-      return kolmafia.myBuffedstat($stat(_templateObject3$4 || (_templateObject3$4 = _taggedTemplateLiteral(["muscle"])))) * 1.5;
+      return kolmafia.myBuffedstat($stat(_templateObject3$5 || (_templateObject3$5 = _taggedTemplateLiteral(["muscle"])))) * 1.5;
     case Mine.KNOB:
       return kolmafia.myBuffedstat($stat(_templateObject4$4 || (_templateObject4$4 = _taggedTemplateLiteral(["muscle"])))) * 0.5;
     case Mine.ANEMONE:
@@ -3514,7 +3514,7 @@ function caveInCost(mine) {
  * @param mine Which mine
  * @returns Page contents
  */
-function findNewCavern(mine) {
+function findNewCavern$1(mine) {
   return kolmafia.visitUrl("mining.php?mine=".concat(mine, "&reset=1&pwd"), true);
 }
 /**
@@ -3622,7 +3622,7 @@ function sinceKolmafiaRevision(revision) {
   }
 }
 
-var _templateObject$5, _templateObject2$4, _templateObject3$3, _templateObject4$3, _templateObject5$3, _templateObject6$3, _templateObject7$3, _templateObject8$2, _templateObject9$2, _templateObject0$2, _templateObject1$2, _templateObject10$2, _templateObject11$1, _templateObject12$1, _templateObject13$1, _templateObject14$1, _templateObject15$1, _templateObject16$1, _templateObject17$1, _templateObject18$1, _templateObject19$1, _templateObject20$1, _templateObject21$1, _templateObject22$1, _templateObject23$1, _templateObject24$1, _templateObject25$1, _templateObject26$1, _templateObject27$1, _templateObject28$1, _templateObject29$1, _templateObject30$1, _templateObject31$1;
+var _templateObject$5, _templateObject2$4, _templateObject3$4, _templateObject4$3, _templateObject5$3, _templateObject6$3, _templateObject7$3, _templateObject8$2, _templateObject9$2, _templateObject0$2, _templateObject1$1, _templateObject10$1, _templateObject11$1, _templateObject12$1, _templateObject13$1, _templateObject14$1, _templateObject15$1, _templateObject16$1, _templateObject17$1, _templateObject18$1, _templateObject19$1, _templateObject20$1, _templateObject21$1, _templateObject22$1, _templateObject23$1, _templateObject24$1, _templateObject25$1, _templateObject26$1, _templateObject27$1, _templateObject28$1, _templateObject29$1, _templateObject30$1, _templateObject31$1;
 /**
  * Return a mapping of the session items, mapping foldable items to a single of their forms
  *
@@ -3633,7 +3633,7 @@ function mySessionItemsWrapper() {
   var sessionOnly = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
   var manyToOne = (primary, mapped) => mapped.map(target => [target, primary]);
   var foldable = item => manyToOne(item, getFoldGroup(item));
-  var itemMappings = new Map([].concat(_toConsumableArray(foldable($item(_templateObject$5 || (_templateObject$5 = _taggedTemplateLiteral(["liar's pants"]))))), _toConsumableArray(foldable($item(_templateObject2$4 || (_templateObject2$4 = _taggedTemplateLiteral(["ice pick"]))))), _toConsumableArray(manyToOne($item(_templateObject3$3 || (_templateObject3$3 = _taggedTemplateLiteral(["Spooky Putty sheet"]))), [$item(_templateObject4$3 || (_templateObject4$3 = _taggedTemplateLiteral(["Spooky Putty monster"])))].concat(_toConsumableArray(getFoldGroup($item(_templateObject5$3 || (_templateObject5$3 = _taggedTemplateLiteral(["Spooky Putty sheet"])))))))), _toConsumableArray(foldable($item(_templateObject6$3 || (_templateObject6$3 = _taggedTemplateLiteral(["stinky cheese sword"]))))), _toConsumableArray(foldable($item(_templateObject7$3 || (_templateObject7$3 = _taggedTemplateLiteral(["naughty paper shuriken"]))))), _toConsumableArray(foldable($item(_templateObject8$2 || (_templateObject8$2 = _taggedTemplateLiteral(["Loathing Legion knife"]))))), _toConsumableArray(foldable($item(_templateObject9$2 || (_templateObject9$2 = _taggedTemplateLiteral(["deceased crimbo tree"]))))), _toConsumableArray(foldable($item(_templateObject0$2 || (_templateObject0$2 = _taggedTemplateLiteral(["makeshift turban"]))))), _toConsumableArray(foldable($item(_templateObject1$2 || (_templateObject1$2 = _taggedTemplateLiteral(["turtle wax shield"]))))), _toConsumableArray(foldable($item(_templateObject10$2 || (_templateObject10$2 = _taggedTemplateLiteral(["metallic foil bow"]))))), _toConsumableArray(foldable($item(_templateObject11$1 || (_templateObject11$1 = _taggedTemplateLiteral(["ironic moustache"]))))), _toConsumableArray(foldable($item(_templateObject12$1 || (_templateObject12$1 = _taggedTemplateLiteral(["bugged balaclava"]))))), _toConsumableArray(foldable($item(_templateObject13$1 || (_templateObject13$1 = _taggedTemplateLiteral(["toggle switch (Bartend)"]))))), _toConsumableArray(foldable($item(_templateObject14$1 || (_templateObject14$1 = _taggedTemplateLiteral(["mushroom cap"]))))), _toConsumableArray(manyToOne($item(_templateObject15$1 || (_templateObject15$1 = _taggedTemplateLiteral(["can of Rain-Doh"]))), $items(_templateObject16$1 || (_templateObject16$1 = _taggedTemplateLiteral(["empty Rain-Doh can"]))))), _toConsumableArray(manyToOne($item(_templateObject17$1 || (_templateObject17$1 = _taggedTemplateLiteral(["meteorite fragment"]))), $items(_templateObject18$1 || (_templateObject18$1 = _taggedTemplateLiteral(["meteorite earring, meteorite necklace, meteorite ring"]))))), _toConsumableArray(manyToOne($item(_templateObject19$1 || (_templateObject19$1 = _taggedTemplateLiteral(["Sneaky Pete's leather jacket"]))), $items(_templateObject20$1 || (_templateObject20$1 = _taggedTemplateLiteral(["Sneaky Pete's leather jacket (collar popped)"]))))), _toConsumableArray(manyToOne($item(_templateObject21$1 || (_templateObject21$1 = _taggedTemplateLiteral(["Boris's Helm"]))), $items(_templateObject22$1 || (_templateObject22$1 = _taggedTemplateLiteral(["Boris's Helm (askew)"]))))), _toConsumableArray(manyToOne($item(_templateObject23$1 || (_templateObject23$1 = _taggedTemplateLiteral(["Jarlsberg's pan"]))), $items(_templateObject24$1 || (_templateObject24$1 = _taggedTemplateLiteral(["Jarlsberg's pan (Cosmic portal mode)"]))))), _toConsumableArray(manyToOne($item(_templateObject25$1 || (_templateObject25$1 = _taggedTemplateLiteral(["tiny plastic sword"]))), $items(_templateObject26$1 || (_templateObject26$1 = _taggedTemplateLiteral(["grogtini, bodyslam, dirty martini, vesper, cherry bomb, sangria del diablo"]))))), _toConsumableArray(manyToOne($item(_templateObject27$1 || (_templateObject27$1 = _taggedTemplateLiteral(["earthenware muffin tin"]))), $items(_templateObject28$1 || (_templateObject28$1 = _taggedTemplateLiteral(["blueberry muffin, bran muffin, chocolate chip muffin"]))))), _toConsumableArray(manyToOne($item(_templateObject29$1 || (_templateObject29$1 = _taggedTemplateLiteral(["ChibiBuddy\u2122 (on)"]))), $items(_templateObject30$1 || (_templateObject30$1 = _taggedTemplateLiteral(["ChibiBuddy\u2122 (off)"])))))));
+  var itemMappings = new Map([].concat(_toConsumableArray(foldable($item(_templateObject$5 || (_templateObject$5 = _taggedTemplateLiteral(["liar's pants"]))))), _toConsumableArray(foldable($item(_templateObject2$4 || (_templateObject2$4 = _taggedTemplateLiteral(["ice pick"]))))), _toConsumableArray(manyToOne($item(_templateObject3$4 || (_templateObject3$4 = _taggedTemplateLiteral(["Spooky Putty sheet"]))), [$item(_templateObject4$3 || (_templateObject4$3 = _taggedTemplateLiteral(["Spooky Putty monster"])))].concat(_toConsumableArray(getFoldGroup($item(_templateObject5$3 || (_templateObject5$3 = _taggedTemplateLiteral(["Spooky Putty sheet"])))))))), _toConsumableArray(foldable($item(_templateObject6$3 || (_templateObject6$3 = _taggedTemplateLiteral(["stinky cheese sword"]))))), _toConsumableArray(foldable($item(_templateObject7$3 || (_templateObject7$3 = _taggedTemplateLiteral(["naughty paper shuriken"]))))), _toConsumableArray(foldable($item(_templateObject8$2 || (_templateObject8$2 = _taggedTemplateLiteral(["Loathing Legion knife"]))))), _toConsumableArray(foldable($item(_templateObject9$2 || (_templateObject9$2 = _taggedTemplateLiteral(["deceased crimbo tree"]))))), _toConsumableArray(foldable($item(_templateObject0$2 || (_templateObject0$2 = _taggedTemplateLiteral(["makeshift turban"]))))), _toConsumableArray(foldable($item(_templateObject1$1 || (_templateObject1$1 = _taggedTemplateLiteral(["turtle wax shield"]))))), _toConsumableArray(foldable($item(_templateObject10$1 || (_templateObject10$1 = _taggedTemplateLiteral(["metallic foil bow"]))))), _toConsumableArray(foldable($item(_templateObject11$1 || (_templateObject11$1 = _taggedTemplateLiteral(["ironic moustache"]))))), _toConsumableArray(foldable($item(_templateObject12$1 || (_templateObject12$1 = _taggedTemplateLiteral(["bugged balaclava"]))))), _toConsumableArray(foldable($item(_templateObject13$1 || (_templateObject13$1 = _taggedTemplateLiteral(["toggle switch (Bartend)"]))))), _toConsumableArray(foldable($item(_templateObject14$1 || (_templateObject14$1 = _taggedTemplateLiteral(["mushroom cap"]))))), _toConsumableArray(manyToOne($item(_templateObject15$1 || (_templateObject15$1 = _taggedTemplateLiteral(["can of Rain-Doh"]))), $items(_templateObject16$1 || (_templateObject16$1 = _taggedTemplateLiteral(["empty Rain-Doh can"]))))), _toConsumableArray(manyToOne($item(_templateObject17$1 || (_templateObject17$1 = _taggedTemplateLiteral(["meteorite fragment"]))), $items(_templateObject18$1 || (_templateObject18$1 = _taggedTemplateLiteral(["meteorite earring, meteorite necklace, meteorite ring"]))))), _toConsumableArray(manyToOne($item(_templateObject19$1 || (_templateObject19$1 = _taggedTemplateLiteral(["Sneaky Pete's leather jacket"]))), $items(_templateObject20$1 || (_templateObject20$1 = _taggedTemplateLiteral(["Sneaky Pete's leather jacket (collar popped)"]))))), _toConsumableArray(manyToOne($item(_templateObject21$1 || (_templateObject21$1 = _taggedTemplateLiteral(["Boris's Helm"]))), $items(_templateObject22$1 || (_templateObject22$1 = _taggedTemplateLiteral(["Boris's Helm (askew)"]))))), _toConsumableArray(manyToOne($item(_templateObject23$1 || (_templateObject23$1 = _taggedTemplateLiteral(["Jarlsberg's pan"]))), $items(_templateObject24$1 || (_templateObject24$1 = _taggedTemplateLiteral(["Jarlsberg's pan (Cosmic portal mode)"]))))), _toConsumableArray(manyToOne($item(_templateObject25$1 || (_templateObject25$1 = _taggedTemplateLiteral(["tiny plastic sword"]))), $items(_templateObject26$1 || (_templateObject26$1 = _taggedTemplateLiteral(["grogtini, bodyslam, dirty martini, vesper, cherry bomb, sangria del diablo"]))))), _toConsumableArray(manyToOne($item(_templateObject27$1 || (_templateObject27$1 = _taggedTemplateLiteral(["earthenware muffin tin"]))), $items(_templateObject28$1 || (_templateObject28$1 = _taggedTemplateLiteral(["blueberry muffin, bran muffin, chocolate chip muffin"]))))), _toConsumableArray(manyToOne($item(_templateObject29$1 || (_templateObject29$1 = _taggedTemplateLiteral(["ChibiBuddy\u2122 (on)"]))), $items(_templateObject30$1 || (_templateObject30$1 = _taggedTemplateLiteral(["ChibiBuddy\u2122 (off)"])))))));
   var inventory = new Map();
   var invLocations = sessionOnly ? [kolmafia.mySessionItems] : [kolmafia.mySessionItems, kolmafia.getCloset, kolmafia.getDisplay, kolmafia.getStorage];
   if (!sessionOnly) {
@@ -4463,7 +4463,7 @@ var CombatResources = /*#__PURE__*/function () {
   }]);
 }();
 
-var _templateObject$4, _templateObject2$3, _templateObject3$2, _templateObject4$2, _templateObject5$2, _templateObject6$2, _templateObject7$2, _templateObject8$1, _templateObject9$1, _templateObject0$1, _templateObject1$1, _templateObject10$1, _templateObject11, _templateObject12, _templateObject13, _templateObject14, _templateObject15, _templateObject16, _templateObject17, _templateObject18, _templateObject19, _templateObject20, _templateObject21, _templateObject22, _templateObject23, _templateObject24, _templateObject25, _templateObject26, _templateObject27, _templateObject28, _templateObject29, _templateObject30, _templateObject31, _templateObject32, _templateObject33, _templateObject34, _templateObject35, _templateObject36, _templateObject37, _templateObject38, _templateObject39, _templateObject40, _templateObject41, _templateObject42, _templateObject43, _templateObject44, _templateObject45, _templateObject46, _templateObject47, _templateObject48, _templateObject49, _templateObject50, _templateObject51, _templateObject52, _templateObject53, _templateObject54, _templateObject55, _templateObject56, _templateObject57, _templateObject58, _templateObject59, _templateObject60, _templateObject61, _templateObject62, _templateObject63, _templateObject64, _templateObject65, _templateObject66, _templateObject67, _templateObject68, _templateObject69, _templateObject70, _templateObject71, _templateObject72, _templateObject73, _templateObject74, _templateObject75, _templateObject76, _templateObject77, _templateObject78, _templateObject79, _templateObject80;
+var _templateObject$4, _templateObject2$3, _templateObject3$3, _templateObject4$2, _templateObject5$2, _templateObject6$2, _templateObject7$2, _templateObject8$1, _templateObject9$1, _templateObject0$1, _templateObject1, _templateObject10, _templateObject11, _templateObject12, _templateObject13, _templateObject14, _templateObject15, _templateObject16, _templateObject17, _templateObject18, _templateObject19, _templateObject20, _templateObject21, _templateObject22, _templateObject23, _templateObject24, _templateObject25, _templateObject26, _templateObject27, _templateObject28, _templateObject29, _templateObject30, _templateObject31, _templateObject32, _templateObject33, _templateObject34, _templateObject35, _templateObject36, _templateObject37, _templateObject38, _templateObject39, _templateObject40, _templateObject41, _templateObject42, _templateObject43, _templateObject44, _templateObject45, _templateObject46, _templateObject47, _templateObject48, _templateObject49, _templateObject50, _templateObject51, _templateObject52, _templateObject53, _templateObject54, _templateObject55, _templateObject56, _templateObject57, _templateObject58, _templateObject59, _templateObject60, _templateObject61, _templateObject62, _templateObject63, _templateObject64, _templateObject65, _templateObject66, _templateObject67, _templateObject68, _templateObject69, _templateObject70, _templateObject71, _templateObject72, _templateObject73, _templateObject74, _templateObject75, _templateObject76, _templateObject77, _templateObject78, _templateObject79, _templateObject80;
 var FORCE_REFRESH_REQUIREMENT = new Requirement([], {
   forceUpdate: true
 });
@@ -4530,7 +4530,7 @@ var Outfit = /*#__PURE__*/function () {
       if (this.equips.has(kolmafia.toSlot(item))) return false;
       switch (kolmafia.toSlot(item)) {
         case $slot(_templateObject2$3 || (_templateObject2$3 = _taggedTemplateLiteral(["off-hand"]))):
-          if (this.equips.has($slot(_templateObject3$2 || (_templateObject3$2 = _taggedTemplateLiteral(["weapon"])))) && weaponHands(this.equips.get($slot(_templateObject4$2 || (_templateObject4$2 = _taggedTemplateLiteral(["weapon"]))))) !== 1) {
+          if (this.equips.has($slot(_templateObject3$3 || (_templateObject3$3 = _taggedTemplateLiteral(["weapon"])))) && weaponHands(this.equips.get($slot(_templateObject4$2 || (_templateObject4$2 = _taggedTemplateLiteral(["weapon"]))))) !== 1) {
             return false;
           }
           break;
@@ -4553,7 +4553,7 @@ var Outfit = /*#__PURE__*/function () {
       if (!kolmafia.canEquip(item)) return false;
       if (slot === undefined) {
         // We don't care which of the accessory slots we equip in
-        var empty = $slots(_templateObject1$1 || (_templateObject1$1 = _taggedTemplateLiteral(["acc1, acc2, acc3"]))).find(s => !this.equips.has(s));
+        var empty = $slots(_templateObject1 || (_templateObject1 = _taggedTemplateLiteral(["acc1, acc2, acc3"]))).find(s => !this.equips.has(s));
         if (empty === undefined) return false;
         this.equips.set(empty, item);
       } else {
@@ -4565,7 +4565,7 @@ var Outfit = /*#__PURE__*/function () {
   }, {
     key: "equipUsingDualWield",
     value: function equipUsingDualWield(item, slot) {
-      if (![undefined, $slot(_templateObject10$1 || (_templateObject10$1 = _taggedTemplateLiteral(["off-hand"])))].includes(slot)) return false;
+      if (![undefined, $slot(_templateObject10 || (_templateObject10 = _taggedTemplateLiteral(["off-hand"])))].includes(slot)) return false;
       if (kolmafia.toSlot(item) !== $slot(_templateObject11 || (_templateObject11 = _taggedTemplateLiteral(["weapon"])))) return false;
       if (this.equips.has($slot(_templateObject12 || (_templateObject12 = _taggedTemplateLiteral(["weapon"])))) && weaponHands(this.equips.get($slot(_templateObject13 || (_templateObject13 = _taggedTemplateLiteral(["weapon"]))))) !== 1) {
         return false;
@@ -6958,7 +6958,7 @@ function calculateMiningValue(collected, used, values, costs, turns) {
   };
 }
 
-var _templateObject$2, _templateObject2$2;
+var _templateObject$2, _templateObject2$2, _templateObject3$2;
 function printHighlight(message) {
   var color = kolmafia.isDarkMode() ? "yellow" : "blue";
   kolmafia.print(message, color);
@@ -6975,7 +6975,30 @@ function assureHotResistance() {
     kolmafia.abort("More hot resistance needed (you have ".concat(kolmafia.numericModifier($modifier(_templateObject2$2 || (_templateObject2$2 = _taggedTemplateLiteral(["Hot Resistance"])))), ", you need 15)."));
   }
 }
+function assureDrill() {
+  if (!args.useMiningOutfit && kolmafia.equippedAmount($item(_templateObject3$2 || (_templateObject3$2 = _taggedTemplateLiteral(["high-temperature mining drill"])))) === 0) {
+    kolmafia.abort("The current outfit must include a high-temperature mining drill.");
+  }
+}
+function assureMineState() {
+  if (getState(Mine.VOLCANO).length !== 36) {
+    kolmafia.abort("Could not read the Velvet / Gold Mine.");
+  }
+}
+function visitMine() {
+  assureDrill();
+  assureHotResistance();
+  visit(Mine.VOLCANO);
+  assureMineState();
+}
+function findNewCavern() {
+  assureDrill();
+  assureHotResistance();
+  findNewCavern$1(Mine.VOLCANO);
+  assureMineState();
+}
 function prepareToMine() {
+  assureDrill();
   assureHotResistance();
   var minHp = caveInCost(Mine.VOLCANO);
   if (args.survive && kolmafia.myHp() < minHp) {
@@ -7147,7 +7170,7 @@ function parseMineLayout(layout) {
   return results;
 }
 
-var _templateObject$1, _templateObject2$1, _templateObject3$1, _templateObject4$1, _templateObject5$1, _templateObject6$1, _templateObject7$1, _templateObject8, _templateObject9, _templateObject0, _templateObject1, _templateObject10;
+var _templateObject$1, _templateObject2$1, _templateObject3$1, _templateObject4$1, _templateObject5$1, _templateObject6$1, _templateObject7$1, _templateObject8, _templateObject9, _templateObject0;
 var gold = $item(_templateObject$1 || (_templateObject$1 = _taggedTemplateLiteral(["1,970 carat gold"])));
 var velvet = $item(_templateObject2$1 || (_templateObject2$1 = _taggedTemplateLiteral(["unsmoothed velvet"])));
 var crystal = $item(_templateObject3$1 || (_templateObject3$1 = _taggedTemplateLiteral(["New Age healing crystal"])));
@@ -7181,6 +7204,7 @@ function buildMiningTasks(controller, accounting) {
   };
   var taskOutfit = args.useMiningOutfit ? miningOutfit : undefined;
   var pendingDecision = null;
+  var mineVisited = false;
   var selectDecision = () => {
     if (pendingDecision) return pendingDecision;
     controller.setDynamiteAvailable(Math.max(kolmafia.itemAmount(dynamite), controller.shouldUseDynamite() ? 1 : 0));
@@ -7190,7 +7214,7 @@ function buildMiningTasks(controller, accounting) {
   };
   var resetCavern = () => {
     if (pendingDecision) explain(pendingDecision.reason);
-    findNewCavern(Mine.VOLCANO);
+    findNewCavern();
     controller.reset();
     pendingDecision = null;
   };
@@ -7226,57 +7250,67 @@ function buildMiningTasks(controller, accounting) {
     do: () => {},
     completed: () => have(medicalKit)
   }, {
-    name: "Move to a new cavern having struck gold in this cavern",
+    name: "Visit the mine",
     after: ["Acquire mining drill", "Acquire hippy medical kit"],
     noCombat: true,
     outfit: taskOutfit,
+    do: () => {
+      visitMine();
+      mineVisited = true;
+    },
+    completed: () => mineVisited
+  }, {
+    name: "Move to a new cavern having struck gold in this cavern",
+    after: ["Visit the mine"],
+    noCombat: true,
+    outfit: taskOutfit,
     ready: () => controller.shouldResetAfterGold() && get("mineLayout6").includes("goldnugget"),
-    prepare: () => assureHotResistance(),
     do: () => {
       explain("Resetting after finding gold.");
       pendingDecision = null;
       resetCavern();
     },
     completed: () => false
-  }, {
+  }].concat(_toConsumableArray(detectionPotion ? [{
     name: "Maintain Object Detection",
-    after: ["Acquire mining drill"],
+    after: ["Visit the mine"],
     noCombat: true,
+    outfit: taskOutfit,
     ready: () => controller.needsObjectDetection() && !hasObjectDetection(Mine.VOLCANO),
+    acquire: [{
+      item: detectionPotion,
+      price: accounting.costs.get(detectionPotion)
+    }],
     do: () => {
-      ensureEffect($effect(_templateObject9 || (_templateObject9 = _taggedTemplateLiteral(["Object Detection"]))));
-      // Refresh the state that was fetched before Object Detection revealed the whole cavern.
-      visit(Mine.VOLCANO);
-      if (detectionPotion) recordItemUse(accounting, detectionPotion);
+      kolmafia.use(1, detectionPotion);
+      if (!hasObjectDetection(Mine.VOLCANO)) {
+        kolmafia.abort("Using ".concat(detectionPotion, " did not grant Object Detection."));
+      }
+      recordItemUse(accounting, detectionPotion);
+      visitMine();
     },
     completed: () => false
-  }, {
+  }] : []), [{
     name: "Move to a new cavern when the strategy has no worthwhile target",
-    after: ["Acquire mining drill", "Acquire hippy medical kit"],
+    after: ["Visit the mine"],
     noCombat: true,
     outfit: taskOutfit,
     ready: () => selectDecision().action === "reset",
-    prepare: () => assureHotResistance(),
-    do: () => resetCavern(),
+    do: resetCavern,
     completed: () => false
   }, {
     name: "Mine the strategy's selected coordinate",
-    after: ["Acquire mining drill", "Acquire hippy medical kit"],
+    after: ["Visit the mine"],
     noCombat: true,
     outfit: args.useMiningOutfit ? () => _objectSpread2(_objectSpread2({}, miningOutfit), {}, {
-      equip: [].concat(_toConsumableArray(miningOutfit.equip), _toConsumableArray(have($item(_templateObject0 || (_templateObject0 = _taggedTemplateLiteral(["Xiblaxian holo-wrist-puter"])))) && !get("_holoWristCrystal") ? [$item(_templateObject1 || (_templateObject1 = _taggedTemplateLiteral(["Xiblaxian holo-wrist-puter"])))] : []))
+      equip: [].concat(_toConsumableArray(miningOutfit.equip), _toConsumableArray(have($item(_templateObject9 || (_templateObject9 = _taggedTemplateLiteral(["Xiblaxian holo-wrist-puter"])))) && !get("_holoWristCrystal") ? [$item(_templateObject0 || (_templateObject0 = _taggedTemplateLiteral(["Xiblaxian holo-wrist-puter"])))] : []))
     }) : undefined,
     acquire: () => controller.shouldUseDynamite() ? [{
       item: dynamite,
       price: dynamitePrice
     }] : [],
     ready: () => selectDecision().action === "mine",
-    prepare: () => {
-      if (!args.useMiningOutfit && kolmafia.equippedAmount($item(_templateObject10 || (_templateObject10 = _taggedTemplateLiteral(["high-temperature mining drill"])))) === 0) {
-        kolmafia.abort("The current outfit must include a high-temperature mining drill.");
-      }
-      prepareToMine();
-    },
+    prepare: prepareToMine,
     do: () => {
       var decision = pendingDecision;
       if (!decision || decision.action !== "mine") {
@@ -7295,7 +7329,7 @@ function buildMiningTasks(controller, accounting) {
       pendingDecision = null;
     },
     completed: () => false
-  }];
+  }]);
 }
 
 var _templateObject, _templateObject2, _templateObject3, _templateObject4, _templateObject5, _templateObject6, _templateObject7;
@@ -7332,12 +7366,6 @@ function runMining(values, lambda) {
   var stopAtTurn = kolmafia.totalTurnsPlayed() + args.turns;
   if (!get("hotAirportAlways") && !get("_hotAirportToday")) {
     kolmafia.abort("You do not have access to That 70s Volcano.");
-  }
-
-  // Make sure the mine state is up to date
-  visit(Mine.VOLCANO);
-  if (getState(Mine.VOLCANO).length !== 36) {
-    kolmafia.abort("Could not access the Velvet / Gold Mine.");
   }
   var accounting = {
     values: new Map([[$item(_templateObject2 || (_templateObject2 = _taggedTemplateLiteral(["unsmoothed velvet"]))), values.ore], [$item(_templateObject3 || (_templateObject3 = _taggedTemplateLiteral(["1,970 carat gold"]))), values.gold], [$item(_templateObject4 || (_templateObject4 = _taggedTemplateLiteral(["New Age healing crystal"]))), values.crystal]]),
